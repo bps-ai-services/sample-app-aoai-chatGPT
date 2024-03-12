@@ -52,7 +52,7 @@ const Layout = () => {
                             aria-hidden="true"
                         />
                         <Link to="/" className={styles.headerTitleContainer}>
-                            <h1 className={styles.headerTitle}>Bass Pro Shops ChatGPT 4</h1>
+                            <h1 className={styles.headerTitle}>WRMG Catalog + ChatGPT 4</h1>
                         </Link>
                     </Stack>
                     <Stack horizontal tokens={{ childrenGap: 4 }}>
