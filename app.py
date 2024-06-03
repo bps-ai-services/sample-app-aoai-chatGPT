@@ -153,8 +153,8 @@ def init_openai_client():
         azure_openai_client = None
         raise e
 
+def init_cosmosdb_client(container_name_str = None):
 
-def init_cosmosdb_client():
     cosmos_conversation_client = None
     if app_settings.chat_history:
         try:
@@ -171,7 +171,7 @@ def init_cosmosdb_client():
                 cosmosdb_endpoint=cosmos_endpoint,
                 credential=credential,
                 database_name=app_settings.chat_history.database,
-                container_name=app_settings.chat_history.conversations_container,
+                container_name=app_settings.chat_history.conversations_container if container_name_str is None else container_name_str,
                 enable_message_feedback=app_settings.chat_history.enable_feedback,
             )
         except Exception as e:
@@ -856,5 +856,46 @@ async def generate_title(conversation_messages):
     except Exception as e:
         return messages[-2]["content"]
 
+@bp.route("/prompttag/load", methods=["GET"])
+async def tag_load():
+        authenticated_user = get_authenticated_user_details(request_headers=request.headers)
+        user_id = authenticated_user["user_principal_id"]
+
+        try:
+            cosmos_conversation_client = init_cosmosdb_client("PromptTag")
+            tag = await cosmos_conversation_client.get_prompt_tags()
+            
+            if not tag:
+                return jsonify({"error": f"No tag were found"}), 404
+
+            await cosmos_conversation_client.cosmosdb_client.close()
+            return jsonify({"prompt_tag": tag}), 200
+        
+        except Exception as e:
+            logging.exception("Exception in /history/delete")
+            return jsonify({"error": str(e)}), 500
+        
+        
+@bp.route("/prompttemplate/load", methods=["GET"])
+async def template_load():
+
+        authenticated_user = get_authenticated_user_details(request_headers=request.headers)
+        user_id = authenticated_user["user_principal_id"]
+
+        try:
+            cosmos_conversation_client = init_cosmosdb_client("PromptTemplate")
+            template = await cosmos_conversation_client.get_prompt_template()
+
+            if not template:
+                return jsonify({"error": f"No template were found"}), 404
+            
+            await cosmos_conversation_client.cosmosdb_client.close()
+            return jsonify({"prompt_template": template}), 200
+        
+        except Exception as e:
+            logging.exception("Exception in /history/delete")
+            return jsonify({"error": str(e)}), 500
+
 
 app = create_app()
+app.run()
