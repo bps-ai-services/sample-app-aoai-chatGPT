@@ -182,3 +182,30 @@ class CosmosConversationClient():
 
         return messages
 
+    # Prompt Tag Service 
+    async def get_prompt_tags(self):
+            
+            query = f"SELECT * FROM c"
+            tags = []
+            async for item in self.container_client.query_items(query=query):
+                tags.append(item)
+
+            ## if no tags are found, return None
+            if len(tags) == 0:
+                return None
+            else:
+                return tags
+            
+   # Get Prompt Template         
+    async def get_prompt_template(self):
+            
+            query = f"SELECT * FROM c"
+            template = []
+            async for item in self.container_client.query_items(query=query):
+                template.append(item)
+
+            ## if no template are found, return None
+            if len(template) == 0:
+                return None
+            else:
+                return template
