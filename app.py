@@ -33,6 +33,7 @@ from backend.utils import (
     convert_to_pf_format,
     format_pf_non_streaming_response,
 )
+from backend.prompt_type import PromptType
 
 bp = Blueprint("routes", __name__, static_folder="static", template_folder="static")
 
