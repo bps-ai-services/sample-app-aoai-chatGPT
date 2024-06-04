@@ -856,44 +856,44 @@ async def generate_title(conversation_messages):
     except Exception as e:
         return messages[-2]["content"]
 
-@bp.route("/prompttag/load", methods=["GET"])
-async def tag_load():
+@bp.route("/tags", methods=["GET"])
+async def get_tags():
         authenticated_user = get_authenticated_user_details(request_headers=request.headers)
         user_id = authenticated_user["user_principal_id"]
 
         try:
-            cosmos_conversation_client = init_cosmosdb_client("PromptTag")
-            tag = await cosmos_conversation_client.get_prompt_tags()
+            cosmos_conversation_client = init_cosmosdb_client("Tags")
+            tag = await cosmos_conversation_client.get_tags()
             
             if not tag:
-                return jsonify({"error": f"No tag were found"}), 404
+                return jsonify({"error": f"No tags were found"}), 404
 
             await cosmos_conversation_client.cosmosdb_client.close()
             return jsonify({"prompt_tag": tag}), 200
         
         except Exception as e:
-            logging.exception("Exception in /history/delete")
+            logging.exception("Exception in /tags")
             return jsonify({"error": str(e)}), 500
         
         
-@bp.route("/prompttemplate/load", methods=["GET"])
-async def template_load():
+@bp.route("/templates", methods=["GET"])
+async def get_templates():
 
         authenticated_user = get_authenticated_user_details(request_headers=request.headers)
         user_id = authenticated_user["user_principal_id"]
 
         try:
-            cosmos_conversation_client = init_cosmosdb_client("PromptTemplate")
-            template = await cosmos_conversation_client.get_prompt_template()
+            cosmos_conversation_client = init_cosmosdb_client("Templates")
+            template = await cosmos_conversation_client.get_template()
 
             if not template:
-                return jsonify({"error": f"No template were found"}), 404
+                return jsonify({"error": f"No templates were found"}), 404
             
             await cosmos_conversation_client.cosmosdb_client.close()
             return jsonify({"prompt_template": template}), 200
         
         except Exception as e:
-            logging.exception("Exception in /history/delete")
+            logging.exception("Exception in /templates")
             return jsonify({"error": str(e)}), 500
 
 

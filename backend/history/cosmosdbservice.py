@@ -184,7 +184,7 @@ class CosmosConversationClient():
 
     
     # Prompt Tag Service 
-    async def get_prompt_tags(self):
+    async def get_tags(self):
             
             query = f"SELECT * FROM c"
             tags = []
@@ -198,7 +198,7 @@ class CosmosConversationClient():
                 return tags
             
    # Get Prompt Template         
-    async def get_prompt_template(self):
+    async def get_template(self):
             
             query = f"SELECT * FROM c"
             template = []
