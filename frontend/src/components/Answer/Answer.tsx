@@ -312,7 +312,7 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked, onBoat
                 <Text variant='large' className={styles.walkaroundContainerHeading}>{walkaround.heading}</Text>
               </Stack.Item>
               <Stack.Item className={styles.walkaroundContainerTextContainer}>
-                <Text variant='xxLarge' className={styles.walkaroundContainerText}>{walkaround.details}</Text>
+                <Text variant='large' className={styles.walkaroundContainerText}>{walkaround.details}</Text>
               </Stack.Item>
             </Stack>
             </div>
