@@ -86,6 +86,7 @@ export type BoatSuggestionResults = {
 }
 
 export type BoatSuggestionResult = {
+  product?: string
   model: string
   summary: string
 }

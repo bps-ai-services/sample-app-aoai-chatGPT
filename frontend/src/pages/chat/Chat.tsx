@@ -798,7 +798,7 @@ const Chat = () => {
       }
     }
 
-    return [{ model: 'M1', summary: 'S1' }];
+    return [{ model: 'M1', summary: 'S1', product: 'P1' }];
   }
 
   const parseErrorFromMessage = (message: ChatMessage) => {

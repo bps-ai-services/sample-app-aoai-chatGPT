@@ -339,7 +339,7 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked, onBoat
               </Stack>
               <Stack style={{marginLeft: '12px'}}>
                 <Stack.Item>
-                  <Text variant='large' className={styles.suggestionContainerHeading}>{boat.model}</Text>
+                  <Text variant='large' className={styles.suggestionContainerHeading}>{boat.product} {boat.model}</Text>
                 </Stack.Item>
                 <Stack.Item>
                   <Text className={styles.suggestionContainerText}>{boat.summary}</Text>
