@@ -1,10 +1,15 @@
 import * as React from 'react';
-import { Stack, TextField, IconButton, PrimaryButton } from '@fluentui/react';
+import { Stack, TextField, IconButton, PrimaryButton, ComboBox, IComboBoxOption, IComboBox } from '@fluentui/react';
 import uuid from 'react-uuid';
 import style from "../../pages/layout/Layout.module.css"
 import { Send24Filled, Send28Filled } from '@fluentui/react-icons';
+import { useEffect, useState } from 'react';
+import { getCities, getStates } from '../../api';
 
 const UserInfo: React.FC = () => {
+  const [states, setStates] = useState<IComboBoxOption[]>([]);
+  const [cities, setCities] = useState<IComboBoxOption[]>([]);
+  const [selectedState, setSelectedState] = useState<string | undefined>();
 
   const textFieldStyle: React.CSSProperties = {
     flex: 1,
@@ -17,6 +22,14 @@ const UserInfo: React.FC = () => {
     flex: 1,
     borderRadius: '25px',
   };
+
+  const comboBoxStyle: React.CSSProperties = {
+    flex: 1,
+    border: 'none',
+    outline: 'none',
+    backgroundColor: 'inherit',
+  };
+
   const [inputValue, setInputValue] = React.useState<string>('');
 
   const handleChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
@@ -35,12 +48,52 @@ const UserInfo: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    // Fetch states from the backend
+    const fetchStates = async () => {
+      var fetchedStates = await getStates();
+      setStates(fetchedStates.map((state: string) => ({ key: state, text: state })));
+    };
+
+    fetchStates();
+  }, []);
+
+  const handleStateChange = async (event: React.FormEvent<IComboBox>, option?: IComboBoxOption) => {
+    if (option) {
+      setSelectedState(option.key as string);
+      // Fetch cities based on the selected state
+      const cities = await getCities(option.key);
+      setCities(cities.map((city: string) => ({ key: city, text: city })));
+    }
+  };
+
   return (
     <Stack horizontalAlign='center' tokens={{ childrenGap: 20 }} styles={{ root: { width: "100%", margin: 'auto' } }}>
       <div style={{
         display: "flex", alignItems: "center", flexDirection: "column",
         width: "100%", padding: "0px 20px"
       }}>
+        <div className={style.comboBoxField}>
+          <div className={style.comboBoxWrapper}>
+            <ComboBox
+              selectedKey={selectedState}
+              options={states}
+              onChange={handleStateChange}
+              style={comboBoxStyle}
+              placeholder='Enter your State'
+            />
+          </div>
+        </div>
+        <div className={style.comboBoxField}>
+          <div className={style.comboBoxWrapper}>
+            <ComboBox
+              options={cities}
+              disabled={!selectedState}
+              style={comboBoxStyle}
+              placeholder='Enter your City'
+            />
+          </div>
+        </div>
         <div className={style.userinputField}>
           <div style={textFieldWrapperStyle}>
             <TextField

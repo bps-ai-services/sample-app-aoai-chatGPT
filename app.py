@@ -1512,5 +1512,22 @@ async def add_conversation_feedback_v3():
         logging.exception("Exception in /history/conversation_feedback")
         return jsonify({"error": str(e)}), 500
 
+state_city_data = {
+    "California": ["Los Angeles", "San Francisco", "San Diego"],
+    "Texas": ["Houston", "Austin", "Dallas"],
+    "Florida": ["Miami", "Orlando", "Tampa"]
+}
+
+@bp.route("/ref/states", methods=["GET"])
+async def get_states():
+    states = list(state_city_data.keys())
+    return json.dumps(states)
+
+@bp.route("/ref/cities", methods=["GET"])
+async def get_cities():
+    state = request.args.get('state')
+    cities = state_city_data.get(state, [])
+    return json.dumps(cities)
 
 app = create_app()
+
