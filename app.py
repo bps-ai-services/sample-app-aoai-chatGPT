@@ -4,6 +4,7 @@ import os
 import logging
 import uuid
 import httpx
+import pandas as pd
 from quart import (
     Blueprint,
     Quart,
@@ -1512,22 +1513,25 @@ async def add_conversation_feedback_v3():
         logging.exception("Exception in /history/conversation_feedback")
         return jsonify({"error": str(e)}), 500
 
-state_city_data = {
-    "California": ["Los Angeles", "San Francisco", "San Diego"],
-    "Texas": ["Houston", "Austin", "Dallas"],
-    "Florida": ["Miami", "Orlando", "Tampa"]
-}
 
 @bp.route("/ref/states", methods=["GET"])
 async def get_states():
-    states = list(state_city_data.keys())
-    return json.dumps(states)
+
+    df = pd.read_csv("data/uscities.csv")
+    unique_states = list(df['state_name'].unique())
+    return json.dumps(unique_states)
 
 @bp.route("/ref/cities", methods=["GET"])
 async def get_cities():
-    state = request.args.get('state')
-    cities = state_city_data.get(state, [])
-    return json.dumps(cities)
+
+    request_json = await request.get_json()
+    state_name = request_json['state_name']
+
+    if state_name:
+        df = pd.read_csv("data/uscities.csv")
+        unique_cities = list(df[df['state_name'] == state_name]['city'].unique())
+        return json.dumps(unique_cities)
+    
+    return None
 
 app = create_app()
-
