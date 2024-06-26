@@ -1578,5 +1578,54 @@ async def validate_inventory():
     
     return extra_in_array1
 
+@bp.route("/v3/re_prompting", methods=["POST"])
+async def re_prompting():
+
+    # prompt= "Our buyers(s) are Solo with Less than 5 people"
+    # request_obj = {
+    # "messages": [
+    #     {
+    #         "id": "aefbbfdc-207b-52d6-df7f-b1b9c6c96feb",
+    #         "role": "user",
+    #         "content": prompt,
+    #         "date": "2024-06-07",
+    #         "prompt_type" : 1,
+    #         "city" : "lahore",
+    #         "state" : "punjab"
+    #     }
+    # ]
+    # }
+    #url = "http://127.0.0.1:5000/v3/history/generate"
+    #response = requests.post(url, json=request_obj)
+    #print(response.json())
+
+    response = await call_add_conversation_v3()
+    print(response.status_code)
+    print(response.json())
+
+
+    return None
+
+
+async def call_add_conversation_v3():
+    url = 'http://127.0.0.1:5000/v3/history/generate'  # Replace with your actual base URL
+    
+    prompt= "Our buyers(s) are Solo with Less than 5 people"
+    request_obj = {
+    "messages": [
+        {
+            "id": "aefbbfdc-207b-52d6-df7f-b1b9c6c96feb",
+            "role": "user",
+            "content": prompt,
+            "date": "2024-06-07",
+            "prompt_type" : 1,
+            "city" : "lahore",
+            "state" : "punjab"
+        }
+    ]
+    }
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, json=request_obj)
+        return response
 
 app = create_app()
