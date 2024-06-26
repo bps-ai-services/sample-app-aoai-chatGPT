@@ -205,3 +205,38 @@ class CosmosConversationClient():
             return resp
         else:
             return False
+        
+    async def get_inventory_detail(self, state, city, brand, model):
+
+        # Define query parameters
+        parameters = [
+            {'name': '@state', 'value': state},
+            {'name': '@city',  'value': city},
+            {'name': '@brand', 'value': brand},
+            {'name': '@model', 'value': model}
+        ]
+
+        # Construct the SQL query with parameters
+        #query = f"SELECT c.DEALER_NUMBER, COUNT(1) AS product_count FROM c WHERE c.DEALER_NUMBER = @storeId AND c.brand = @brand AND c.MODEL = @model GROUP BY c.DEALER_NUMBER"
+        # query = f"SELECT * FROM c WHERE c.DEALER_NUMBER = @storeId AND c.brand = @brand AND c.MODEL = @model"
+        query = f"SELECT * FROM c WHERE c.STATE = @state AND c.CITY = @city AND c.brand = @brand AND c.MODEL = @model"
+        
+        results = []
+
+        try:
+            # Query items asynchronously
+            async for item in self.container_client.query_items(query=query,parameters=parameters,partition_key=None):
+                results.append(item)
+
+            # Return the first result if any, otherwise None
+            return results[0] if results else None
+
+        except exceptions.CosmosHttpResponseError as e:
+            # Handle Cosmos DB HTTP response error
+            print(f"Error: {e}")
+            return None
+
+        except Exception as e:
+            # Handle other exceptions
+            print(f"Error: {e}")
+            return None    

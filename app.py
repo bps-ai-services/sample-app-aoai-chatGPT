@@ -155,7 +155,8 @@ def init_openai_client():
         raise e
 
 
-def init_cosmosdb_client():
+def init_cosmosdb_client(container_name_str = None):
+
     cosmos_conversation_client = None
     if app_settings.chat_history:
         try:
@@ -172,7 +173,7 @@ def init_cosmosdb_client():
                 cosmosdb_endpoint=cosmos_endpoint,
                 credential=credential,
                 database_name=app_settings.chat_history.database,
-                container_name=app_settings.chat_history.conversations_container,
+                container_name=app_settings.chat_history.conversations_container if container_name_str is None else container_name_str,
                 enable_message_feedback=app_settings.chat_history.enable_feedback,
             )
         except Exception as e:
@@ -183,6 +184,7 @@ def init_cosmosdb_client():
         logging.debug("CosmosDB not configured")
 
     return cosmos_conversation_client
+
 
 
 def prepare_model_args(request_body, request_headers):
@@ -1511,6 +1513,70 @@ async def add_conversation_feedback_v3():
     except Exception as e:
         logging.exception("Exception in /history/conversation_feedback")
         return jsonify({"error": str(e)}), 500
+
+
+# inventory calling
+@bp.route("/v3/get_inventory_detail", methods=["POST"])
+async def get_inventory_detail1():
+
+    authenticated_user = get_authenticated_user_details(request_headers=request.headers)
+    user_id = authenticated_user["user_principal_id"]
+    cosmos_conversation_client = init_cosmosdb_client("inventory")
+
+    ## check request for message_id
+    request_json = await request.get_json()
+
+    state = "FL"
+    city = "GAINESVILLE"
+    brand= "SUN TRACKER"
+    model= "BB18 24"
+
+    try:
+        inv = await cosmos_conversation_client.get_inventory_detail(state,city,brand,model)
+        print(inv)
+
+    except Exception as e:
+        logging.exception("Exception in /v3/get_inventory_detail")
+        return jsonify({"error": str(e)}), 500
+    
+    return None
+
+
+def arrays_match(array1, array2):
+    # Check if lengths of the arrays match
+    if len(array1) != len(array2):
+        return False
+    
+    # Check if all elements in the arrays match
+    for item1, item2 in zip(array1, array2):
+        if item1 != item2:
+            return False
+    
+    return True
+
+@bp.route("/v3/validate_inventory", methods=["POST"])
+async def validate_inventory():
+
+    inv_models = ['SUN TRACKER' , 'TAHOE' , 'REGENCY', 'Lala']
+    llm_models = ['SUN TRACKER' , 'TAHOE' , 'REGENCY']
+
+    prompt= "Our buyers(s) are Solo with Less than 5 people. Who also enjoy Watersports, including Wakeboarding. What are the top 3 boat models we should recommend?"
+
+    exlude_array = []
+
+    set1 = set(inv_models)
+    set2 = set(llm_models)
+    
+    extra_in_array1 = set1 - set2
+    #extra_in_array2 = set2 - set1
+    
+    if extra_in_array1:
+        print(f"Extra elements in first array: {extra_in_array1}")
+    # if extra_in_array2:
+    #     print(f"Extra elements in second array: {extra_in_array2}")
+
+    
+    return extra_in_array1
 
 
 app = create_app()
