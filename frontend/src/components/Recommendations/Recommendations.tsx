@@ -6,12 +6,12 @@ import { AppStateContext } from '../../state/AppProvider';
 import { getRecommendations } from '../../api';
 import commonStyle from "../ProductInformation/ProductInfo.module.css";
 import style from "./Recommendations.module.css"
-
+import loading from "../../assets/loader.gif"
 //import boatImages from '../../constants/boatImages';
 import { mergeStyles } from '@fluentui/react/lib/Styling';
 import BackButton from '../BackButton';
 import Image1 from "../../assets/BlackHullRedAccentsRedBimini_BMT-6911_main.avif"
-
+import NoDataGif from "../../assets/noData.gif"
 import R250LE3 from  "../../assets/LE35_BMT-6805_alt1.jpeg"
 import R250DL3 from  "../../assets/DL34_BMT-6803_alt1.jpeg"
 import R230DL3 from  "../../assets/DL37_BMT-6802_alt1.jpeg"
@@ -38,6 +38,7 @@ import SF22 from  "../../assets/Black_BMT-6799_main.jpeg"
 import SF22XP3 from  "../../assets/Caribou_BMT-6800_alt1.jpeg"
 import SF24XP3 from  "../../assets/Caribou_BMT-6801_main.avif"
 import SFB20 from  "../../assets/IndigoBlue_BMT-6795_main.jpeg"
+import PrimaryButtonComponent from '../common/PrimaryButtonComponent';
 
 
 const boatImages: {[key:string]: string} = {
@@ -98,14 +99,14 @@ const imageClass = mergeStyles({
         width: "100px"
     },
     '@media (min-width: 600px) and (max-width: 1000px)': {
-        height: '190px !important',
-        width: "250px",
+        height: '130px !important',
+        width: "200px",
         marginLeft: 5,
         padding: "20px"
     },
     '@media (min-width: 1000px) and (max-width: 2500px)': {
-        height: '160px !important',
-        width: "250px",
+        height: '120px !important',
+        width: "200px",
         marginLeft: 5,
         padding: "20px"
     },
@@ -118,19 +119,24 @@ const divClass = mergeStyles({
         width: "100px"
     },
     '@media (min-width: 600px) and (max-width: 1000px)': {
-        height: '200px',
-        width: "200px"
+        height: '130px',
+        width: "150px"
     },
     '@media (min-width: 1000px) and (max-width: 2500px)': {
-        height: '140px',
-        width: "250px"
+        height: '120px',
+        width: "200px"
     },
+    '.ms-Image > img':{
+        width:"100%",
+        objectFit:"contain"
+    }
 });
 
 const About: React.FC = () => {
     const navigate = useNavigate();
     const appStateContext = useContext(AppStateContext);
     const [selectedItem, setSelectedItem] = useState<any>(null);
+    const [userCity,setUserCity]=useState<string>("");
     const dummyData = appStateContext?.state?.recommendation;
     const isLoading = appStateContext?.state?.isLoadingRecommendations;
     const promptValue = appStateContext?.state?.promptvalue
@@ -138,9 +144,15 @@ const About: React.FC = () => {
     const fetch = async () => {
         try {
             appStateContext?.dispatch({ type: 'SET_RECOMMENDATIONS_LOADING', payload: true })
-
-            const response =await getRecommendations(promptValue || '')
-        
+            const userCityStored=localStorage.getItem("userInfo");
+            let city;
+            if(userCityStored){
+            city=JSON.parse(userCityStored);
+            }
+            const response =await getRecommendations(promptValue || '',city[0].name || "")
+            // const response = {
+            //     "messages": "{\"result\":[{\"brand\": \"Regency\", \"model\": \"SFB20\", \"summary\": \"Luxury pontoon boat with seating for 14, sleek design, Bluetooth stereo, spacious seat storage, and exhilarating performance for watersports.\"}, {\"brand\": \"Sun Tracker\", \"model\": \"250 LE3 Sport\", \"summary\": \"Luxury pontoon boat with seating for 14, STOW MORE seat storage system, powered Bimini top, and 350-horsepower rating for watersports.\"}, {\"brand\": \"Tahao\", \"model\": \"DL3 Series\", \"summary\": \"Luxurious tritoon with richly appointed interior, plush seating, STOW-MORE hidden storage, soft-touch woven flooring, and Wet Sounds Audio System.\"}]}"
+            // };
            
             const parsedData = JSON.parse(response?.messages);
             const actuallRecommendations = parsedData?.result
@@ -207,7 +219,6 @@ const About: React.FC = () => {
         for (const key in boatImages) {
             const normalizedKey = normalizeString(key);
             const matchScore = calculateMatchScore(normalizedKey, modelParts);
-            console.log(normalizedBrand,normalizedModel,modelParts,matchScore,normalizedKey)
             if (matchScore > bestMatchScore && bestMatchScore  > 2) {
                 bestMatchScore = matchScore;
                 bestMatchKey = key;
@@ -247,31 +258,35 @@ const About: React.FC = () => {
 
         <div className={styles.chatContainer}>
             {isLoading ? (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
-                    <Spinner styles={{ circle: { height: 40, width: 40, border: "2px solid #FFFFFF" }, label: { color: "#FFFFFF", fontSize: "1rem" } }} label="Loading recommendations..." />
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "calc(100vh - 100px)" }}>
+                    <img src={loading} alt="Logo" className="logo" style={{opacity:"0.3",width:"300px"}} />
                 </div>
             ) : (
                 <Stack className={style.contentMainStackContainer}>
                     <Stack className={style.contentStackContainer}>
                         {dummyData && dummyData.length > 0 && (
+                            <div className={style.headingMainDiv}>
                             <div className={commonStyle.headingDiv}>
                                 <BackButton onClick={() => navigate("/")}></BackButton>
                                 <Text
-                                    className={commonStyle.headingText}>Top Recommendations for this store</Text>
+                                    className={commonStyle.headingText}>Top Recommendations</Text>
+                            </div>
                             </div>
                         )}
                         {dummyData && dummyData.length > 0 && dummyData.map((item, index) => (
                             <DefaultButton key={index} styles={{
                                 root: {
                                     width: '100%',
-                                    '@media (max-width: 600px)': {
-                                        maxHeight: 150
-                                    },
+                                    // '@media (max-width: 600px)': {
+                                    //     maxHeight: 150
+                                    // },
                                     '@media (max-width: 1000px) and (min-width: 600px)': {
-                                        minHeight: 200
+                                        // minHeight: 200
+                                        height:180,
+
                                     },
                                     '@media (max-width: 2500px) and (min-width: 756px)': {
-                                        height:180,
+                                        height:160,
                                         padding: 20,
                                     },
                                     height: "100%", padding: "12px", borderRadius: "20px", backgroundColor: selectedItem === item ? "#FFFFFF" : "#D0D0D0"
@@ -279,9 +294,9 @@ const About: React.FC = () => {
                             }} onClick={() => handleNextClick(item.model,item.brand)}>
                                 <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 10 }} style={{ width: "100%" }} styles={{
                                     root: {
-                                        '@media (max-width: 600px)': {
-                                            maxHeight: 150
-                                        },
+                                        // '@media (max-width: 600px)': {
+                                        //     maxHeight: 150
+                                        // },
                                         '@media (max-width: 1000px) and (min-width: 600px)': {
                                             minHeight: 200
                                         },
@@ -300,31 +315,29 @@ const About: React.FC = () => {
                                     </div>
  
                                     <Stack tokens={{ childrenGap: 10 }}
-                                        style={{ display: "flex", alignItems: "start", justifyContent: "center", textAlign: "initial", width: "100%", marginLeft: 15 }}
+                                        style={{ display: "flex", alignItems: "start", justifyContent: "center", textAlign: "initial", width: "100%", marginLeft: 0, padding:"15px 0px 15px 15px", }}
                                         styles={{
                                             root: {
                                                 '@media (max-width: 1000px)': {
-                                                    marginLeft: 10
                                                 },
                                                 '@media (max-width: 2500px) and (min-width: 1000px)': {
-                                                    marginLeft: 20,
-                                                    padding: "18px"
                                                 },
                                             }
                                         }}>
                                         <Text
                                             styles={{
                                                 root: {
+                                                    marginBottom: 10,
+                                                    fontWeight: "bold",
                                                     '@media (max-width: 600px)': {
-                                                        fontWeight: "700", fontSize: "14px", lineHeight: "20px", fontStyle: "normal",
+                                                        fontSize: "14px", lineHeight: "18px"
                                                     },
                                                     '@media (max-width: 1000px) and (min-width: 600px)': {
-                                                        fontWeight: "bold", fontSize: "24px", lineHeight: "20px", fontStyle: "normal",
-                                                        marginBottom: 20
+                                                        fontSize: "18px", lineHeight: "22px"
                                                     },
                                                     '@media (max-width: 2500px) and (min-width: 1000px)': {
-                                                        fontWeight: "bold", fontSize: "20px", lineHeight: "20px", fontStyle: "normal",
-                                                        marginBottom: 20
+                                                         fontSize: "20px", lineHeight: "24px"
+                                                        
                                                     },
                                                 }
                                             }}
@@ -332,15 +345,15 @@ const About: React.FC = () => {
                                         <Text
                                             styles={{
                                                 root: {
-                                                    marginTop: 0,
+                                                    marginTop: 0,fontSize: "16px", lineHeight: "24px",
                                                     '@media (max-width: 600px)': {
-                                                        fontWeight: "500", fontSize: "12px", lineHeight: "18px", fontStyle: "normal",
+                                                        fontSize: "12px", lineHeight: "18px",
                                                     },
                                                     '@media (max-width: 1000px) and (min-width: 600px)': {
-                                                        fontWeight: "500", fontSize: "18px", lineHeight: "30px", fontStyle: "normal",
+                                                        fontSize: "14px", lineHeight: "22px",
                                                     },
                                                     '@media (max-width: 2500px) and (min-width: 1000px)': {
-                                                        fontWeight: "500", fontSize: "16px", lineHeight: "24px", fontStyle: "normal",
+                                                        // fontSize: "16px", lineHeight: "24px",
                                                     },
                                                 }
                                             }}
@@ -351,9 +364,12 @@ const About: React.FC = () => {
                         ))}
                     </Stack>
                     {dummyData && dummyData.length === 0 && (
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
-                            <Text style={{ fontWeight: "bold", color: "#FFFFFF" }} variant="xLarge" >No Recommendations found</Text>
-                        </div>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "center",height: "calc(100vh - 100px)" ,flexDirection:"column"}}>
+                        <img src={NoDataGif} alt="Logo"  style={{opacity:"0.3",width:"100px",marginBottom:10}} />
+                        <Text className={commonStyle.noDataText} style={{textAlign:'center',padding:"0px 20px",marginBottom:10}}>We couldn't find any boats that meet your needs.</Text>
+                        <Text className={commonStyle.noDataText} style={{textAlign:'center',padding:"0px 20px",marginBottom:20}}>Please try different inputs.</Text>
+                        <PrimaryButtonComponent label="Go Back" onClick={()=>navigate("/")} disabled={false} width='fit-content'/>
+                    </div>
                     )}
                 </Stack>
             )}

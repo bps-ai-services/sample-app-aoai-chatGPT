@@ -9,8 +9,25 @@ import template from '../../constants/templete'
 import style from './Home.module.css'
 import Chip from '../Chip'
 import TextFieldComponent from './TextField'
+import DesktopTextField from './DesktopTextField';
 
 const Home: React.FC = () => {
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const appendedQuestion=". What are the top 3 boat models you would recommend, phrase your response as [Brand] [Model] and limit responses to specific brand and models, not series.";
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   const appStateContext = useContext(AppStateContext)
   const [inputValue, setInputValue] = useState<string>('')
   const [isTextFieldFocused, setIsTextFieldFocused] = useState<boolean>(false)
@@ -118,8 +135,6 @@ const Home: React.FC = () => {
         }
       })
 
-      result += "What are the top 3 boat models you would recommend, phrase your response as [Brand] [Model] and limit responses to specific brand and models, not series.";
-
     return result.trim()
   }
 
@@ -127,20 +142,22 @@ const Home: React.FC = () => {
     const processedTemplate = processTemplate()
     if (processedTemplate.trim() !== '' && selectedKeys?.length > 0) {
       setInputValue(processedTemplate)
+    } else {
+      setInputValue("")
+      setTextFieldValue("")
     }
   }, [selectedKeys])
 
   const buttonDisabled = useMemo(() => {
-    return selectedKeys?.length === 0
-  }, [selectedKeys, inputValue])
+    return selectedKeys?.length === 0 
+  }, [selectedKeys, inputValue,textFieldValue])
 
   const handleSubmit = () => {
-    const inputPayload = inputValue + ` ${textFieldValue}`;
+    const inputPayload = inputValue + ` ${textFieldValue}` + appendedQuestion;
     appStateContext?.dispatch({ type: 'SET_PROMPT_VALUE', payload: inputPayload })
-    
     navigate("/recommendations");
 };
-
+console.log({inputValue})
   const handleRemove = (selectedKey: string) => {
     setSelectedKeys(selectedKeys.filter(item => item.key !== selectedKey))
     setTags(prevTags => {
@@ -167,26 +184,28 @@ const Home: React.FC = () => {
       return initialTags
     })
     setSelectedKeys([])
+    setInputValue("");
+    setTextFieldValue("");
   }
 
   return (
+    <>
     <Stack className={style.mainStackContainer}>
+      {selectedKeys?.length>0 && (<div className={style.resetDiv}>
+        <DefaultButton
+          onClick={() => resetAllClick()}
+          className={style.resetButton}
+          styles={{
+            label: { fontWeight: 'normal', color: 'rgba(255,255,255,0.41)' }
+          }}>
+          Reset
+        </DefaultButton>
+      </div>)}
       <Stack className={style.mainContentStackContainer}>
+        
         <Stack className={style.contentStackContainer} style={{ opacity: isTextFieldFocused ? 0.3 : 1 }}>
           {Object.keys(tags).map(key => (
             <React.Fragment key={key}>
-              {key === 'who' && (
-                <div className={style.resetDiv}>
-                  <DefaultButton
-                    onClick={() => resetAllClick()}
-                    className={style.resetButton}
-                    styles={{
-                      label: { fontWeight: 'normal', color: 'rgba(255,255,255,0.41)' }
-                    }}>
-                    Reset
-                  </DefaultButton>
-                </div>
-              )}
               <Stack className={style.tagTypeStack}>
                 <Text className={style.heading}>
                   <div>
@@ -233,22 +252,16 @@ const Home: React.FC = () => {
                   </Stack.Item>
                 ))}
                 {tags[key].tags.length > 5 && (
-                  <Stack.Item
-                    grow={1}
-                    disableShrink
-                    styles={{
-                      root: {
-                        minWidth: '90px',
-                        maxWidth: '90px',
-                        marginLeft: 10,
-                        marginTop: 10,
-                        display: 'inline-table'
-                      }
-                    }}>
+                  <Stack.Item  grow={1} disableShrink className={style.stackitem}>
                     <DefaultButton
                       styles={{
                         root: {
-                          height: '50px',
+                          width: "60px",
+                          height: "100%",
+                          padding: "18px",
+                          fontSize: "14px",
+                          letterSpacing: "0px",
+                          fontWeight: 600,
                           backgroundColor: 'transparent',
                           color: '#819188',
                           border: '1px solid black',
@@ -265,32 +278,52 @@ const Home: React.FC = () => {
           ))}
         </Stack>
       </Stack>
-      <div
-        className={style.footer}
-        style={{
-          height: isTextFieldFocused ? '280px' : '100px',
-          bottom: isTextFieldFocused ? '20px' : '0px',
-          alignItems: isTextFieldFocused ? 'end' : 'center'
-        }}>
-        <Stack tokens={{ childrenGap: 20 }} horizontalAlign="center" className={style.footerMainStack}>
-          <div className={style.inputContainer}>
-            <TextFieldComponent
-              placeholder="Anything else?"
-              allowBorder={false}
-              text={textFieldValue}
-              setText={setTextFieldValue}
-              isButtonRequired={isTextFieldFocused}
-              onFocus={() => setIsTextFieldFocused(true)} // Set focused state on focus
-              onBlur={() => setIsTextFieldFocused(false)}
-              isTextFieldFocused={isTextFieldFocused} // Remove focused state on blur
-            />
-          </div>
-          <div className={style.buttonContainer}>
-            <CustomIconButton onButtonClick={handleSubmit} disabled={buttonDisabled} />
-          </div>
-        </Stack>
-      </div>
+      {/* {windowWidth <1700 ? ( */}
+
+            {/* ) : ( */}
+        <div className={style.desktopTextField}>
+        <DesktopTextField 
+                      placeholder="Anything else?"
+                      allowBorder={false}
+                      text={textFieldValue}
+                      setText={setTextFieldValue}
+                      isButtonRequired={true}
+                      promptValue={inputValue}
+                      onFocus={() => setIsTextFieldFocused(true)} // Set focused state on focus
+                      onBlur={() => setIsTextFieldFocused(false)}
+                      isTextFieldFocused={isTextFieldFocused} 
+                      isButtonEnabled={selectedKeys?.length>0}
+        />
+        </div>
+            {/* )} */}
     </Stack>
+          <div
+          className={style.footer}
+          style={{
+            height: isTextFieldFocused ? '280px' : '100px',
+            bottom: isTextFieldFocused ? '20px' : '0px',
+            alignItems: isTextFieldFocused ? 'end' : 'center',
+          }}>
+          <Stack tokens={{ childrenGap: 20 }} horizontalAlign="center" className={style.footerMainStack}>
+            <div className={style.inputContainer}>
+              <TextFieldComponent
+                placeholder="Anything else?"
+                allowBorder={false}
+                text={textFieldValue}
+                setText={setTextFieldValue}
+                isButtonRequired={isTextFieldFocused}
+                onFocus={() => setIsTextFieldFocused(true)} // Set focused state on focus
+                onBlur={() => setIsTextFieldFocused(false)}
+                isTextFieldFocused={isTextFieldFocused} // Remove focused state on blur
+                disabled={buttonDisabled}
+              />
+            </div>
+            <div className={style.buttonContainer}>
+              <CustomIconButton onButtonClick={handleSubmit} disabled={buttonDisabled} />
+            </div>
+          </Stack>
+        </div>
+        </>
   )
 }
 
