@@ -1,10 +1,17 @@
 import * as React from 'react';
-import { Stack, TextField, IconButton, PrimaryButton } from '@fluentui/react';
+import { Stack, TextField, IconButton, PrimaryButton, ComboBox, IComboBoxOption, IComboBox } from '@fluentui/react';
 import uuid from 'react-uuid';
 import style from "../../pages/layout/Layout.module.css"
 import { Send24Filled, Send28Filled } from '@fluentui/react-icons';
+import { useEffect, useState } from 'react';
+import { getCities, getStates } from '../../api';
+import CityAutocompleteInput from '../common/CityAutoComplete';
+import PrimaryButtonComponent from '../common/PrimaryButtonComponent';
 
 const UserInfo: React.FC = () => {
+  const [states, setStates] = useState<IComboBoxOption[]>([]);
+  const [cities, setCities] = useState<IComboBoxOption[]>([]);
+  const [selectedState, setSelectedState] = useState<string | undefined>();
 
   const textFieldStyle: React.CSSProperties = {
     flex: 1,
@@ -17,6 +24,14 @@ const UserInfo: React.FC = () => {
     flex: 1,
     borderRadius: '25px',
   };
+
+  const comboBoxStyle: React.CSSProperties = {
+    flex: 1,
+    border: 'none',
+    outline: 'none',
+    backgroundColor: 'inherit',
+  };
+
   const [inputValue, setInputValue] = React.useState<string>('');
 
   const handleChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
@@ -26,7 +41,9 @@ const UserInfo: React.FC = () => {
   const handleSave = () => {
     const dataToSave = { name: inputValue, id: uuid() };
     localStorage.setItem('userInfo', JSON.stringify([dataToSave]));
+    if(inputValue){
     window.location.reload();
+    }
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -35,13 +52,90 @@ const UserInfo: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    // Fetch states from the backend
+    const fetchStates = async () => {
+      var fetchedStates = await getStates();
+      setStates(fetchedStates.map((state: string) => ({ key: state, text: state })));
+    };
+
+    fetchStates();
+  }, []);
+
+  const handleStateChange = async (event: React.FormEvent<IComboBox>, option?: IComboBoxOption) => {
+    if (option) {
+      setSelectedState(option.key as string);
+      // Fetch cities based on the selected state
+      const cities = await getCities(option.key);
+      setCities(cities.map((city: string) => ({ key: city, text: city })));
+    }
+  };
+
+  const suggestions = [
+    "DANIA BEACH, FL",
+    "JACKSONVILLE, FL",
+    "ORLANDO, FL",
+    "DESTIN, FL",
+    "BRADENTON, FL",
+    "FORT MYERS, FL",
+    "MIAMI, FL",
+    "BRADENTON, FL",
+    "PORT ST. LUCIE, FL",
+    "TALLAHASSEE, FL",
+    "PALM BAY, FL",
+    "TAMPA, FL",
+    "GAINESVILLE, FL",
+    "DAYTONA, FL",
+    "ISLAMORADA, FL",
+      ]
+
   return (
-    <Stack horizontalAlign='center' tokens={{ childrenGap: 20 }} styles={{ root: { width: "100%", margin: 'auto' } }}>
-      <div style={{
-        display: "flex", alignItems: "center", flexDirection: "column",
-        width: "100%", padding: "0px 20px"
+    <Stack horizontalAlign='center'
+      tokens={{ childrenGap: 20 }}
+      styles={{
+        root: {
+          width: "100%",
+          margin: 'auto',
+          height: "calc(100vh - 100px)",
+          '@media (max-width: 600px)': {
+            height: "calc(100vh - 70px)",
+          },
+          justifyContent: 'center'
+        }
       }}>
-        <div className={style.userinputField}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          flexDirection: "column",
+          width: "100%",
+          gap:"10px",
+          padding: "0px 20px"
+        }}>
+        {/* <div className={style.comboBoxField}>
+          <div className={style.comboBoxWrapper}>
+            <ComboBox
+              selectedKey={selectedState}
+              options={states}
+              onChange={handleStateChange}
+              style={comboBoxStyle}
+              placeholder='Enter your State'
+            />
+          </div>
+        </div>
+        <div className={style.comboBoxField}>
+          <div className={style.comboBoxWrapper}>
+            <ComboBox
+              options={cities}
+              disabled={!selectedState}
+              style={comboBoxStyle}
+              placeholder='Enter your City'
+            />
+          </div>
+        </div> */}
+        <CityAutocompleteInput suggestions={suggestions} setSelectedValue={setInputValue} handleSave={handleSave}/>
+        {/* <PrimaryButtonComponent onClick={handleSave} label='Submit' disabled={inputValue===""} width='300px'/> */}
+        {/* <div className={style.userinputField}>
           <div style={textFieldWrapperStyle}>
             <TextField
               placeholder={"Enter your city name"}
@@ -87,14 +181,30 @@ const UserInfo: React.FC = () => {
                 color: "#FFFFFF",
                 borderRadius: 10, border: "none",
                 minWidth:0,
-                padding:"0px 5px"
+                padding:"0px 5px",
+                selectors: {
+                  ':hover': {
+                    background: 'transparent !important',
+                    border:"none !important",
+                    borderColor:"transparent !important"
+                  },
+                  ':active': {
+                    background: '#202a2f',
+                    border:"none !important"
+                  },
+                  ':focus': {
+                    background: 'transparent',
+                    border:"none !important"
+                  }
+                }
               }
+              
             }}
           >
             <Send28Filled />
           </PrimaryButton>
 
-        </div>
+        </div> */}
       </div>
     </Stack>
   );

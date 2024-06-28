@@ -13,10 +13,11 @@ interface Props {
   isButtonRequired?: boolean
   onFocus?: () => void;
   onBlur?: () => void;
-  isTextFieldFocused?: boolean
+  isTextFieldFocused?: boolean;
+  disabled?: boolean;
 }
  
-const TextFieldComponent: React.FC<Props> = ({ placeholder, onButtonClick, text, setText, allowBorder = false, isButtonRequired = true, onFocus, onBlur, isTextFieldFocused = false }) => {
+const TextFieldComponent: React.FC<Props> = ({ placeholder, onButtonClick, text, setText, allowBorder = false, isButtonRequired = true, onFocus, onBlur, isTextFieldFocused = false,disabled=false }) => {
   const containerStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
@@ -39,7 +40,7 @@ const TextFieldComponent: React.FC<Props> = ({ placeholder, onButtonClick, text,
     flex: 1,
     borderRadius: '25px',
     height: "100%",
-    padding:isTextFieldFocused ? "25px 25px" :"0"
+    padding:isTextFieldFocused ? "15px 15px" :"0"
   };
   const appStateContext = useContext(AppStateContext)
  
@@ -56,7 +57,7 @@ const TextFieldComponent: React.FC<Props> = ({ placeholder, onButtonClick, text,
     event.stopPropagation();
     event.preventDefault();
     setIsButtonClicked(true);
-    const inputPayload = text + ` ${inputText}`;
+    const inputPayload = text + ` ${text}`;
     appStateContext?.dispatch({ type: 'SET_PROMPT_VALUE', payload: inputPayload })
     navigate("recommendations");
     setIsButtonClicked(false);
@@ -85,84 +86,49 @@ const TextFieldComponent: React.FC<Props> = ({ placeholder, onButtonClick, text,
   };
  
   return (
-      <div className={isTextFieldFocused ? style.focusInputField : style.mainInputField}>
+      <div className={isTextFieldFocused ? style.focusInputField : style.mainInputField} style={{backgroundColor:disabled?"#37474F":"#909B97"}}>
         <div style={textFieldWrapperStyle}>
           <TextField
             placeholder={placeholder}
+            disabled={disabled}
             borderless
-            value={inputText}
+            value={text}
             resizable={false}
             multiline
-            rows={isTextFieldFocused ? 4 : 1}
+            rows={isTextFieldFocused ? 3 : 1}
             styles={{
               root: {
-                color: "#000000",
-                // '@media (max-width: 1000px)': {
-                //   fontSize: "14px",
-                //   height: isTextFieldFocused ? "150px" : "30px",
-                // },
-                // '@media (max-width: 2500px) and (min-width: 1000px)': {
-                //   fontSize: "24px",
-                //   fontWeight: "100",
-                //   marginLeft: !isTextFieldFocused ? 15 : 2,
-                //   height: isTextFieldFocused ? "230px" : "50px",
-                // },
-                textOverflow: !isTextFieldFocused ? 'ellipsis' : 'initial',
+                color: "#151B1E",
+                textOverflow: 'ellipsis',
                 overflow: 'hidden',
               },
               fieldGroup: {
                 borderRadius: '25px',
                 backgroundColor: 'inherit',
                 minHeight:'auto',
-                // '@media (max-width: 1000px)': {
-                //   fontSize: "14px",
-                //   height: isTextFieldFocused ? "150px" : "30px",
-                // },
-                // '@media (max-width: 2500px) and (min-width: 1000px)': {
-                //   fontSize: "24px",
-                //   fontWeight: "100",
-                //   height: isTextFieldFocused ? "230px" : "50px",
-                // },
                 textOverflow: !isTextFieldFocused ? 'ellipsis' : 'initial',
                 overflow: 'hidden',
                 lineHeight: isTextFieldFocused ? "1.6em" : "1,5em",
                 border: 'none',
+                paddingRight: 10
               },
               field: {
+                whiteSpace: isTextFieldFocused ? 'normal' : 'nowrap',
                 backgroundColor: 'inherit',
-                textOverflow: !isTextFieldFocused ? 'ellipsis' : 'initial',
-                fontSize:"24px",
-                fontWeight:isTextFieldFocused ? 400:600,
- 
-                overflow: 'hidden',
-                // '@media (max-width: 600px)': {
-                //   fontSize: "14px",
-                //   height: isTextFieldFocused ? "150px" : "30px",
-                // },
-                // '@media (max-width: 1000px) and (min-width: 600px)': {
-                //   fontSize: "18px",
-                //   fontWeight: "500",
-                //   height: isTextFieldFocused ? "230px" : "50px",
-                // },
-                // '@media (max-width: 2500px) and (min-width: 1000px)': {
-                //   fontSize: "30px",
-                //   fontWeight: "100",
-                //   height: isTextFieldFocused ? "230px" : "50px",
-                // },
-                lineHeight: isTextFieldFocused ? "1.6em" : "1.2em",
-                color:"#3A4146",
-                '@media all and (max-width:575px)':{
-                  padding:'0 10px',
-                  fontSize:"20px",
-                  lineHeight:'normal',
+                fontSize:"22px",
+                fontWeight:400,
+                padding:!isTextFieldFocused ?"15px 15px 15px 25px" :"0px 10px",
+                overflow: isTextFieldFocused?"auto": 'hidden',
+                lineHeight:"30px",
+                color:"#151B1E",
+                '@media (max-width: 600px)': {
+                  fontSize:"18px",
                 },
                 '::placeholder': {
-                  color:"#3A4146",
-                    fontWeight: "500",
-                    fontSize:"22px",
-                    '@media all and (max-width:575px)':{
-                      fontSize:"20px",
-                    },
+                  color:disabled ?"#536F7D": "#3A4146" ,
+                    fontWeight: "400",
+                    fontSize:"18px",
+                    lineHeight:"28px"
                 },
               },
             }}
