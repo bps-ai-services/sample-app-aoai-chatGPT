@@ -10,6 +10,7 @@ import style from './Home.module.css'
 import Chip from '../Chip'
 import TextFieldComponent from './TextField'
 import DesktopTextField from './DesktopTextField';
+import ReactGA from 'react-ga4';
 
 const Home: React.FC = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -190,6 +191,13 @@ const Home: React.FC = () => {
   const handleSubmit = () => {
     const inputPayload = inputValue + ` ${textFieldValue && textFieldValue+"."}` + appendedQuestion;
     appStateContext?.dispatch({ type: 'SET_PROMPT_VALUE', payload: inputPayload })
+
+    ReactGA.event({
+      category: 'Mobile Lets Go Btn',
+      action: 'Click',
+      label: 'Mobile Lets Go Btn',
+  });
+
     navigate("/recommendations");
 };
 

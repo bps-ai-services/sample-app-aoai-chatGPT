@@ -68,11 +68,11 @@ const DesktopTextField: React.FC<Props> = ({ placeholder, onButtonClick, text,se
     setIsButtonClicked(false);
 
     ReactGA.event({
-      category: 'Social Links',
+      category: 'Desktop Lets Go Btn',
       action: 'Click',
-      label: 'platform',
+      label: 'Desktop Lets Go Btn',
   });
-  
+
   };
  
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
