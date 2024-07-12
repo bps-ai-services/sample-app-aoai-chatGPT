@@ -15,6 +15,7 @@ import ProductInformation from './components/ProductInformation/ProductInformati
 import Feedback from './components/Feedback/Feedback'
 import PreventBackNavigation from './components/common/PreventBackNavigation'
 import ReactGA from 'react-ga4';
+import MSClarityScript from './msclaritytag'
 
 initializeIcons()
 
@@ -29,25 +30,12 @@ export default function App() {
   }, [])
 
 
-  
-
-  // Send pageview with a custom path
-  
-
-  //const ga4react = new GA4React('G-XXXXXXXXXX');
-  // // Initialize Google Analytics 4 with your measurement ID
-  // const ga4react = new GA4React('G-L0S6VRT5BT');
-
-  // ga4react.initialize();
-  // const location = useLocation();
-  
-  // useEffect(() => {
-  //   ReactGA.send('pageview', { page_path: location.pathname,page_title: document.title,}); 
-  // }, [location]);
-
+    
   return (
     
     <AppStateProvider>
+    <MSClarityScript />
+    
       <BrowserRouter>
       <PreventBackNavigation />
         <Routes>
