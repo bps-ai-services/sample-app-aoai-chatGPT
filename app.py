@@ -1469,7 +1469,8 @@ async def conversation_internal_v3(request_body, request_headers):
 
 async def complete_chat_request_v3(request_body, request_headers):
     logger.error("calling the get_user_state_via_ms_graph .......")
-    get_user_state_via_ms_graph()
+    
+    await get_user_state_via_ms_graph()
 
     if app_settings.base_settings.use_promptflow:
         
@@ -1626,9 +1627,27 @@ async def add_conversation_feedback_v3():
 from msgraph import GraphServiceClient
 from azure.identity import ClientSecretCredential
 
+async def get_user_details(user_id):
+
+    CLIENT_ID = '3bf00fa6-49f1-42ad-9317-b5a7cb68beab'
+    TENANT_ID = '035c9b6a-9ba7-4804-a377-482ed2642e72'
+    #AUTHORITY = f'https://login.microsoftonline.com/{TENANT_ID}'
+    SCOPE = ['https://graph.microsoft.com/.default']
+
+    AUTH_CLIENT_SECRET = os.environ.get("AUTH_CLIENT_SECRET", "")
+
+    # Create the credential object
+    credentials = ClientSecretCredential(TENANT_ID, CLIENT_ID, AUTH_CLIENT_SECRET)
+
+    # Initialize the Graph client
+    graph_client = GraphServiceClient(credentials, SCOPE)            
+
+    # Fetch user details
+    user = await graph_client.users[user_id].get()
+    return user
 
 #@bp.route("/get_user_state_via_ms_graph", methods=["POST"])
-def get_user_state_via_ms_graph():
+async def get_user_state_via_ms_graph():
     authenticated_user = get_authenticated_user_details(request_headers=request.headers)
     user_id = authenticated_user["user_principal_id"]
 
@@ -1640,79 +1659,22 @@ def get_user_state_via_ms_graph():
     logger.error(f"AUTH_CLIENT_SECRET: {AUTH_CLIENT_SECRET}")
 
     try:    
-        CLIENT_ID = '3bf00fa6-49f1-42ad-9317-b5a7cb68beab'
-        TENANT_ID = '035c9b6a-9ba7-4804-a377-482ed2642e72'
-        #AUTHORITY = f'https://login.microsoftonline.com/{TENANT_ID}'
-        SCOPE = ['https://graph.microsoft.com/.default']
-
-
-        # Create the credential object
-        credentials = ClientSecretCredential(TENANT_ID, CLIENT_ID, AUTH_CLIENT_SECRET)
-
-        # Initialize the Graph client
-        graph_client = GraphServiceClient(credentials, SCOPE)
-
+        
         # Fetch user details
-        user_details = graph_client.users.by_user_id(user_id).get()
+        user_details = user_details = await get_user_details(user_id) #graph_client.users.by_user_id(user_id).get()
+
+        logger.error(f"user: {user_details}")
 
         display_name = user_details.get('displayName')
         email = user_details.get('mail')
         state = user_details.get('state')
         country = user_details.get('country')  # or use 'countryOrRegion' based on your Azure AD configuration
 
-        logger.error(f"user: {user_details}")
-
         logger.error(f"User Display Name: {display_name}")
         logger.error(f"User Email: {email}")
-        logger.error(f"User Email: {state}")
-        logger.error(f"User Email: {country}")
+        logger.error(f"User state: {state}")
+        logger.error(f"User country: {country}")
     
-
-    # Define the user ID
-    #user_id = 'user-id'    
-
-    # try:
-    #     app = msal.ConfidentialClientApplication(
-    #     CLIENT_ID,
-    #     authority=AUTHORITY,
-    #     client_credential=AUTH_CLIENT_SECRET,
-    # )
-        
-    #     result = app.acquire_token_for_client(scopes=SCOPE)
-    #     if 'access_token' in result:
-    #         access_token = result['access_token']
-    #         logger.error(f"access_token: {access_token}")
-
-    #     else:
-    #         logger.error("Error acquiring token:")
-    #         logger.error(result.get("error"))
-    #         logger.error(result.get("error_description"))
-    #         logger.error(result.get("correlation_id"))  # Log error details
-    #         return None
-
-
-    #     graph_endpoint = f'https://graph.microsoft.com/v1.0/users/{user_id}'
-
-    #     logger.error(f"graph_endpoint: {graph_endpoint}")
-
-    #     headers = {
-    #         'Authorization': f'Bearer {access_token}',
-    #         'Accept': 'application/json',
-    #     }
-    #     response = requests.get(graph_endpoint, headers=headers)
-
-    #     # Check if the request was successful
-    #     if response.status_code == 200:
-    #         user_data = response.json()
-            
-    #         # Extract displayName
-    #         display_name = user_data.get('displayName')
-            
-    #         logger.error(f'Display Name: {display_name}')
-    #     else:
-    #         logger.error(f'Failed to fetch user details. Status code: {response.status_code}')
-    #         logger.error(response.text)
-
         return None
 
 
@@ -1720,5 +1682,4 @@ def get_user_state_via_ms_graph():
         logger.error(f"Unexpected error: {e}")
         return None
  
-
 app = create_app()
