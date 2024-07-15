@@ -1371,7 +1371,7 @@ async def add_conversation_feedback():
 async def add_conversation_v3():
     authenticated_user = get_authenticated_user_details(request_headers=request.headers)
     user_id = authenticated_user["user_principal_id"]
-        
+
     ## check request for conversation_id
     request_json = await request.get_json()
     # conversation_id = request_json.get("conversation_id", None)
@@ -1627,6 +1627,12 @@ async def add_conversation_feedback_v3():
 #@bp.route("/get_user_state_via_ms_graph", methods=["POST"])
 def get_user_state_via_ms_graph():
 
+    
+    authenticated_user = get_authenticated_user_details(request_headers=request.headers)
+    user_id = authenticated_user["user_principal_id"]
+
+    logger.error(f'user_id: {user_id}')
+
     logger.error("calling receive get_user_state_via_ms_graph()")
 
     AUTH_CLIENT_SECRET = os.environ.get("AUTH_CLIENT_SECRET", "")
@@ -1638,6 +1644,7 @@ def get_user_state_via_ms_graph():
     AUTHORITY = f'https://login.microsoftonline.com/{TENANT_ID}'
     SCOPE = ['https://graph.microsoft.com/.default']
 
+    
 
     try:
         app = msal.ConfidentialClientApplication(
@@ -1658,7 +1665,11 @@ def get_user_state_via_ms_graph():
             logger.error(result.get("correlation_id"))  # Log error details
             return None
 
-        graph_endpoint = f'https://graph.microsoft.com/v1.0/me'
+
+        graph_endpoint = f'https://graph.microsoft.com/v1.0/users/{user_id}'
+
+        logger.error(f"graph_endpoint: {graph_endpoint}")
+
         headers = {
             'Authorization': f'Bearer {access_token}',
             'Accept': 'application/json',
