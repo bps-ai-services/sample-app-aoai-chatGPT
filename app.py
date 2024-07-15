@@ -14,9 +14,9 @@ from quart import (
     render_template,
 )
 
-import pyad.adquery
-import pyad.aduser
-
+import requests
+import msal
+from msal import ConfidentialClientApplication
 
 from logging import INFO, getLogger
 from openai import AsyncAzureOpenAI
@@ -1623,14 +1623,6 @@ async def add_conversation_feedback_v3():
         return jsonify({"error": str(e)}), 500
 
 
-import getpass
-from pyad import aduser
-
-import requests
-import msal
-
-from msal import ConfidentialClientApplication
-import jwt
 
 @bp.route("/get_user_state_via_ms_graph", methods=["POST"])
 async def get_user_state_via_ms_graph():
@@ -1685,3 +1677,4 @@ async def get_user_state_via_ms_graph():
 
 
 app = create_app()
+app.run()
