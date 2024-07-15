@@ -1643,8 +1643,14 @@ async def get_user_details(user_id):
     graph_client = GraphServiceClient(credentials, SCOPE)            
 
     # Fetch user details
-    user = await graph_client.users.by_user_id(user_id).get()
-    return user
+    me = await graph_client.me.get() #await graph_client.users.by_user_id(user_id).get()
+
+    print(f"User Display Name: {me.display_name}")
+    print(f"User Email: {me.mail or me.user_principal_name}")
+    print(f"User State: {me.state}")
+    print(f"User Country: {me.country}")
+    
+    return me
 
 #@bp.route("/get_user_state_via_ms_graph", methods=["POST"])
 async def get_user_state_via_ms_graph():
@@ -1661,19 +1667,19 @@ async def get_user_state_via_ms_graph():
     try:    
         
         # Fetch user details
-        user_details = user_details = await get_user_details(user_id) #graph_client.users.by_user_id(user_id).get()
+        user_details = await get_user_details(user_id) #graph_client.users.by_user_id(user_id).get()
 
-        logger.error(f"user: {user_details}")
+        logger.error(f"user_details: {user_details}")
 
-        display_name = user_details.get('displayName')
-        email = user_details.get('mail')
-        state = user_details.get('state')
-        country = user_details.get('country')  # or use 'countryOrRegion' based on your Azure AD configuration
+        # display_name = user_details.get('displayName')
+        # email = user_details.get('mail')
+        # state = user_details.get('state')
+        # country = user_details.get('country')  # or use 'countryOrRegion' based on your Azure AD configuration
 
-        logger.error(f"User Display Name: {display_name}")
-        logger.error(f"User Email: {email}")
-        logger.error(f"User state: {state}")
-        logger.error(f"User country: {country}")
+        # logger.error(f"User Display Name: {display_name}")
+        # logger.error(f"User Email: {email}")
+        # logger.error(f"User state: {state}")
+        # logger.error(f"User country: {country}")
     
         return None
 
