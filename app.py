@@ -1653,9 +1653,19 @@ def get_user_state_via_ms_graph():
         graph_client = GraphServiceClient(credentials, SCOPE)
 
         # Fetch user details
-        user = graph_client.users.by_user_id(user_id).get()
+        user_details = graph_client.users.by_user_id(user_id).get()
 
-        logger.error(f"user: {user}")
+        display_name = user_details.get('displayName')
+        email = user_details.get('mail')
+        state = user_details.get('state')
+        country = user_details.get('country')  # or use 'countryOrRegion' based on your Azure AD configuration
+
+        logger.error(f"user: {user_details}")
+
+        logger.error(f"User Display Name: {display_name}")
+        logger.error(f"User Email: {email}")
+        logger.error(f"User Email: {state}")
+        logger.error(f"User Email: {country}")
     
 
     # Define the user ID
