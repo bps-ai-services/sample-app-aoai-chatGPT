@@ -1631,7 +1631,7 @@ def get_user_state_via_ms_graph():
 
     AUTH_CLIENT_SECRET = os.environ.get("AUTH_CLIENT_SECRET", "")
 
-    logger.error(f"get_user_state_via_ms_graph: {AUTH_CLIENT_SECRET}")
+    logger.error(f"AUTH_CLIENT_SECRET: {AUTH_CLIENT_SECRET}")
     
     CLIENT_ID = '3bf00fa6-49f1-42ad-9317-b5a7cb68beab'
     TENANT_ID = '035c9b6a-9ba7-4804-a377-482ed2642e72'
@@ -1649,6 +1649,8 @@ def get_user_state_via_ms_graph():
         result = app.acquire_token_for_client(scopes=SCOPE)
         if 'access_token' in result:
             access_token = result['access_token']
+            logger.error(f"access_token: {access_token}")
+
         else:
             logger.error("Error acquiring token:")
             logger.error(result.get("error"))
@@ -1656,19 +1658,27 @@ def get_user_state_via_ms_graph():
             logger.error(result.get("correlation_id"))  # Log error details
             return None
 
-        graph_endpoint = f'https://graph.microsoft.com/v1.0/me/'
+        graph_endpoint = f'https://graph.microsoft.com/v1.0/me'
         headers = {
             'Authorization': f'Bearer {access_token}',
             'Accept': 'application/json',
         }
         response = requests.get(graph_endpoint, headers=headers)
-        response.raise_for_status()  # Raise exception for non-2xx status codes
 
-        user_data = response.json()
-        user_state = user_data.get('state', user_data.get('stateOrProvince'))
-        logger.info(f"user state or province: {user_state}")
+        # Check if the request was successful
+        if response.status_code == 200:
+            user_data = response.json()
+            
+            # Extract displayName
+            display_name = user_data.get('displayName')
+            
+            logger.error(f'Display Name: {display_name}')
+        else:
+            logger.error(f'Failed to fetch user details. Status code: {response.status_code}')
+            logger.error(response.text)
 
-        return user_data
+        return None
+
 
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
