@@ -1643,7 +1643,7 @@ async def get_user_details(user_id):
     graph_client = GraphServiceClient(credentials, SCOPE)            
 
     # Fetch user details
-    user = await graph_client.users[user_id].get()
+    user = await graph_client.users.by_user_id(user_id).get()
     return user
 
 #@bp.route("/get_user_state_via_ms_graph", methods=["POST"])
