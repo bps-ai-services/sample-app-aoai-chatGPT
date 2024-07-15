@@ -1623,70 +1623,85 @@ async def add_conversation_feedback_v3():
         return jsonify({"error": str(e)}), 500
 
 
+from msgraph import GraphServiceClient
+from azure.identity import ClientSecretCredential
+
 
 #@bp.route("/get_user_state_via_ms_graph", methods=["POST"])
 def get_user_state_via_ms_graph():
-
-    
     authenticated_user = get_authenticated_user_details(request_headers=request.headers)
     user_id = authenticated_user["user_principal_id"]
 
     logger.error(f'user_id: {user_id}')
-
     logger.error("calling receive get_user_state_via_ms_graph()")
 
     AUTH_CLIENT_SECRET = os.environ.get("AUTH_CLIENT_SECRET", "")
 
     logger.error(f"AUTH_CLIENT_SECRET: {AUTH_CLIENT_SECRET}")
-    
-    CLIENT_ID = '3bf00fa6-49f1-42ad-9317-b5a7cb68beab'
-    TENANT_ID = '035c9b6a-9ba7-4804-a377-482ed2642e72'
-    AUTHORITY = f'https://login.microsoftonline.com/{TENANT_ID}'
-    SCOPE = ['https://graph.microsoft.com/.default']
 
+    try:    
+        CLIENT_ID = '3bf00fa6-49f1-42ad-9317-b5a7cb68beab'
+        TENANT_ID = '035c9b6a-9ba7-4804-a377-482ed2642e72'
+        #AUTHORITY = f'https://login.microsoftonline.com/{TENANT_ID}'
+        SCOPE = ['https://graph.microsoft.com/.default']
+
+
+        # Create the credential object
+        credentials = ClientSecretCredential(TENANT_ID, CLIENT_ID, AUTH_CLIENT_SECRET)
+
+        # Initialize the Graph client
+        graph_client = GraphServiceClient(credentials, SCOPE)
+
+        # Fetch user details
+        user = graph_client.users.by_user_id(user_id).get()
+
+        logger.error(f"user: {user}")
     
 
-    try:
-        app = msal.ConfidentialClientApplication(
-        CLIENT_ID,
-        authority=AUTHORITY,
-        client_credential=AUTH_CLIENT_SECRET,
-    )
+    # Define the user ID
+    #user_id = 'user-id'    
+
+    # try:
+    #     app = msal.ConfidentialClientApplication(
+    #     CLIENT_ID,
+    #     authority=AUTHORITY,
+    #     client_credential=AUTH_CLIENT_SECRET,
+    # )
         
-        result = app.acquire_token_for_client(scopes=SCOPE)
-        if 'access_token' in result:
-            access_token = result['access_token']
-            logger.error(f"access_token: {access_token}")
+    #     result = app.acquire_token_for_client(scopes=SCOPE)
+    #     if 'access_token' in result:
+    #         access_token = result['access_token']
+    #         logger.error(f"access_token: {access_token}")
 
-        else:
-            logger.error("Error acquiring token:")
-            logger.error(result.get("error"))
-            logger.error(result.get("error_description"))
-            logger.error(result.get("correlation_id"))  # Log error details
-            return None
+    #     else:
+    #         logger.error("Error acquiring token:")
+    #         logger.error(result.get("error"))
+    #         logger.error(result.get("error_description"))
+    #         logger.error(result.get("correlation_id"))  # Log error details
+    #         return None
 
 
-        graph_endpoint = f'https://graph.microsoft.com/v1.0/users/{user_id}'
+    #     graph_endpoint = f'https://graph.microsoft.com/v1.0/users/{user_id}'
 
-        logger.error(f"graph_endpoint: {graph_endpoint}")
+    #     logger.error(f"graph_endpoint: {graph_endpoint}")
 
-        headers = {
-            'Authorization': f'Bearer {access_token}',
-            'Accept': 'application/json',
-        }
-        response = requests.get(graph_endpoint, headers=headers)
+    #     headers = {
+    #         'Authorization': f'Bearer {access_token}',
+    #         'Accept': 'application/json',
+    #     }
+    #     response = requests.get(graph_endpoint, headers=headers)
 
-        # Check if the request was successful
-        if response.status_code == 200:
-            user_data = response.json()
+    #     # Check if the request was successful
+    #     if response.status_code == 200:
+    #         user_data = response.json()
             
-            # Extract displayName
-            display_name = user_data.get('displayName')
+    #         # Extract displayName
+    #         display_name = user_data.get('displayName')
             
-            logger.error(f'Display Name: {display_name}')
-        else:
-            logger.error(f'Failed to fetch user details. Status code: {response.status_code}')
-            logger.error(response.text)
+    #         logger.error(f'Display Name: {display_name}')
+    #     else:
+    #         logger.error(f'Failed to fetch user details. Status code: {response.status_code}')
+    #         logger.error(response.text)
 
         return None
 
