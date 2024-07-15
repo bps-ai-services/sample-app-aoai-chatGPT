@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Carousel from "react-spring-3d-carousel";
-import { useSpring, animated } from "react-spring";
 import { useDrag } from "react-use-gesture";
 import { config } from "react-spring";
 import style from "./Card.module.css";
