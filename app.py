@@ -1625,9 +1625,14 @@ async def add_conversation_feedback_v3():
 
 
 #@bp.route("/get_user_state_via_ms_graph", methods=["POST"])
-async def get_user_state_via_ms_graph():
+def get_user_state_via_ms_graph():
+
+    logger.error("calling receive get_user_state_via_ms_graph()")
 
     AUTH_CLIENT_SECRET = os.environ.get("AUTH_CLIENT_SECRET", "")
+
+    logger.error(f"get_user_state_via_ms_graph: {AUTH_CLIENT_SECRET}")
+    
     CLIENT_ID = '3bf00fa6-49f1-42ad-9317-b5a7cb68beab'
     TENANT_ID = '035c9b6a-9ba7-4804-a377-482ed2642e72'
     AUTHORITY = f'https://login.microsoftonline.com/{TENANT_ID}'
@@ -1664,14 +1669,6 @@ async def get_user_state_via_ms_graph():
         logger.info(f"user state or province: {user_state}")
 
         return user_data
-
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Request error: {e}")
-        return None
-
-    except msal.MsalServiceError as e:
-        logger.error(f"MSAL error: {e}")
-        return None
 
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
