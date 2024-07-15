@@ -1468,7 +1468,7 @@ async def conversation_internal_v3(request_body, request_headers):
             return jsonify({"error": str(e)}), 500
 
 async def complete_chat_request_v3(request_body, request_headers):
-    logging.error("calling the get_user_state_via_ms_graph .......")
+    logger.error("calling the get_user_state_via_ms_graph .......")
     get_user_state_via_ms_graph()
 
     if app_settings.base_settings.use_promptflow:
