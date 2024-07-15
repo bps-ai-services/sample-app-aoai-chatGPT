@@ -1624,57 +1624,58 @@ async def add_conversation_feedback_v3():
 
 
 
-@bp.route("/get_user_state_via_ms_graph", methods=["POST"])
+#@bp.route("/get_user_state_via_ms_graph", methods=["POST"])
 async def get_user_state_via_ms_graph():
-    
-    
-    AUTH_CLIENT_SECRET = os.environ.get("AUTH_CLIENT_SECRET", "")
 
-    # Azure AD and Microsoft Graph configuration
+    AUTH_CLIENT_SECRET = os.environ.get("AUTH_CLIENT_SECRET", "")
     CLIENT_ID = '3bf00fa6-49f1-42ad-9317-b5a7cb68beab'
-    
-    AUTH_CLIENT_SECRET = AUTH_CLIENT_SECRET # 
     TENANT_ID = '035c9b6a-9ba7-4804-a377-482ed2642e72'
     AUTHORITY = f'https://login.microsoftonline.com/{TENANT_ID}'
-    #SCOPE = ['User.Read']
+    SCOPE = ['https://graph.microsoft.com/.default']
 
 
-    # Create a confidential client application
-    app = msal.ConfidentialClientApplication(
+    try:
+        app = msal.ConfidentialClientApplication(
         CLIENT_ID,
         authority=AUTHORITY,
         client_credential=AUTH_CLIENT_SECRET,
     )
+        
+        result = app.acquire_token_for_client(scopes=SCOPE)
+        if 'access_token' in result:
+            access_token = result['access_token']
+        else:
+            logger.error("Error acquiring token:")
+            logger.error(result.get("error"))
+            logger.error(result.get("error_description"))
+            logger.error(result.get("correlation_id"))  # Log error details
+            return None
 
-    #SCOPE = ['User.Read']
-    SCOPE = ['https://graph.microsoft.com/.default']
-    
-    # Acquire a token
-    result = app.acquire_token_for_client(scopes=SCOPE)
-    if 'access_token' in result:
-        access_token = result['access_token']
-    else:
-        print("Error acquiring token:")
-        print(result.get("error"))
-        print(result.get("error_description"))
-        print(result.get("correlation_id"))  # You might want to log this when reporting a bug
+        graph_endpoint = f'https://graph.microsoft.com/v1.0/me/'
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+            'Accept': 'application/json',
+        }
+        response = requests.get(graph_endpoint, headers=headers)
+        response.raise_for_status()  # Raise exception for non-2xx status codes
 
-    #user_token = request.headers.get("X-MS-TOKEN-AAD-ACCESS-TOKEN", "")
+        user_data = response.json()
+        user_state = user_data.get('state', user_data.get('stateOrProvince'))
+        logger.info(f"user state or province: {user_state}")
 
-    graph_endpoint = f'https://graph.microsoft.com/v1.0/me/'
-    
-    headers = {
-        'Authorization': f'Bearer {access_token}',
-        'Accept': 'application/json',
-    }
-    response = requests.get(graph_endpoint, headers=headers)
-    user_data = response.json()
-    user_state = user_data.get('state', user_data.get('stateOrProvince'))
+        return user_data
 
-    logger.error(f"user state or province : {user_state}")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Request error: {e}")
+        return None
 
-    return None
+    except msal.MsalServiceError as e:
+        logger.error(f"MSAL error: {e}")
+        return None
 
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
+        return None
+ 
 
 app = create_app()
-app.run()
