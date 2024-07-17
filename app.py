@@ -1468,9 +1468,6 @@ async def conversation_internal_v3(request_body, request_headers):
             return jsonify({"error": str(e)}), 500
 
 async def complete_chat_request_v3(request_body, request_headers):
-    logger.error("calling the get_user_state_via_ms_graph .......")
-    
-    await get_user_state_via_ms_graph()
 
     if app_settings.base_settings.use_promptflow:
         
@@ -1682,7 +1679,6 @@ async def get_user_state_via_ms_graph():
         # logger.error(f"User country: {country}")
     
         return None
-
 
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
