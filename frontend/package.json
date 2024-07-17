@@ -15,6 +15,8 @@
     "format": "npm run prettier:fix && npm run lint:fix"
   },
   "dependencies": {
+    "@azure/msal-browser": "^3.19.1",
+    "@azure/msal-react": "^2.0.21",
     "@fluentui/react": "^8.105.3",
     "@fluentui/react-hooks": "^8.6.29",
     "@fluentui/react-icons": "^2.0.195",

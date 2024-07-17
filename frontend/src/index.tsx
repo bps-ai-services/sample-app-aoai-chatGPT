@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, HashRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { initializeIcons } from '@fluentui/react'
@@ -17,25 +17,35 @@ import PreventBackNavigation from './components/common/PreventBackNavigation'
 import ReactGA from 'react-ga4';
 import MSClarityScript from './msclaritytag'
 
+import { PublicClientApplication } from '@azure/msal-browser';
+import { msalConfig } from './authConfig'
+import { MsalProvider } from '@azure/msal-react';
+import { useMsal, useMsalAuthentication } from '@azure/msal-react';
+import { InteractionType } from '@azure/msal-browser';
+
+
+const msalInstance = new PublicClientApplication(msalConfig);
+
 initializeIcons()
 
 export default function App() {
-  
-  const GA_TRACKING_ID = 'G-L0S6VRT5BT'; // Replace with your Google Analytics tracking ID
-  
-  useEffect(() => {
-    ReactGA.initialize(GA_TRACKING_ID);
-    // Send pageview with a custom path
-    ReactGA.send({ hitType: "pageview", page: window.location.pathname });
-  }, [])
 
+  useMsalAuthentication(InteractionType.Redirect);
+  const { accounts } = useMsal();
+  const username = accounts[0] ? accounts[0].username : "";
 
+  
+  // const GA_TRACKING_ID = 'G-L0S6VRT5BT'; // Replace with your Google Analytics tracking ID
+  
+  // useEffect(() => {
+  //   ReactGA.initialize(GA_TRACKING_ID);
+  //   // Send pageview with a custom path
+  //   ReactGA.send({ hitType: "pageview", page: window.location.pathname });
+  // }, [])
     
   return (
-    
     <AppStateProvider>
     <MSClarityScript />
-    
       <BrowserRouter>
       <PreventBackNavigation />
         <Routes>
@@ -51,12 +61,22 @@ export default function App() {
           </Route>
         </Routes>
       </BrowserRouter>
+      {username && (
+        <div className="user-info">
+          User: {username}
+        </div>
+      )}
+      
     </AppStateProvider>
   )
 }
 
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   // <React.StrictMode>
+  <MsalProvider instance={msalInstance}>
+
     <App />
+  </MsalProvider>
   // </React.StrictMode>
 )
