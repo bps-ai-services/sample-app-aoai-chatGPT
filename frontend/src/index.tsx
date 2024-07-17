@@ -18,11 +18,11 @@ import ReactGA from 'react-ga4';
 import MSClarityScript from './msclaritytag'
 
 import { PublicClientApplication } from '@azure/msal-browser';
-import { msalConfig } from './authConfig'
-import { MsalProvider } from '@azure/msal-react';
-import { useMsal, useMsalAuthentication } from '@azure/msal-react';
+import { loginRequest, msalConfig } from './authConfig'
+// import { MsalProvider } from '@azure/msal-react';
+// import { useMsal, useMsalAuthentication } from '@azure/msal-react';
 import { InteractionType } from '@azure/msal-browser';
-
+import { MsalProvider, useMsal, AuthenticatedTemplate, UnauthenticatedTemplate, useIsAuthenticated, useMsalAuthentication } from '@azure/msal-react';
 
 const msalInstance = new PublicClientApplication(msalConfig);
 
@@ -32,8 +32,8 @@ export default function App() {
 
   useMsalAuthentication(InteractionType.Redirect);
   const { accounts } = useMsal();
-  const username = accounts[0] ? accounts[0].username : "";
-
+  const isAuthenticated = useIsAuthenticated();
+  const username = isAuthenticated && accounts[0] ? accounts[0].username : "";
   
   // const GA_TRACKING_ID = 'G-L0S6VRT5BT'; // Replace with your Google Analytics tracking ID
   
@@ -42,6 +42,13 @@ export default function App() {
   //   // Send pageview with a custom path
   //   ReactGA.send({ hitType: "pageview", page: window.location.pathname });
   // }, [])
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      msalInstance.loginRedirect(loginRequest);
+    }
+  }, [isAuthenticated, accounts]);
+
     
   return (
     <AppStateProvider>
@@ -61,12 +68,12 @@ export default function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-      {username && (
-        <div className="user-info">
-          User: {username}
-        </div>
-      )}
-      
+      {isAuthenticated && (
+          <div className="user-info">
+            User: {msalInstance.getAllAccounts()[0]?.username}
+          </div>
+        )}
+
     </AppStateProvider>
   )
 }
