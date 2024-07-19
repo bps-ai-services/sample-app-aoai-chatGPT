@@ -1,5 +1,7 @@
-import React, { createContext, ReactNode, useEffect, 
-  useReducer } from 'react'
+import React, {
+  createContext, ReactNode, useEffect,
+  useReducer
+} from 'react'
 
 import {
   ChatHistoryLoadingState,
@@ -27,17 +29,17 @@ export interface AppState {
   currentChat: Conversation | null
   frontendSettings: FrontendSettings | null
   feedbackState: { [answerId: string]: Feedback.Neutral | Feedback.Positive | Feedback.Negative }
-  recommendation : Recommendations[] | null
-  valuePropositions :ValuePropositions[] | null
-  walkthorugh:WalkThrough[] | null
-  isLoadingRecommendations :boolean
-  isLoadingValuePropositions :boolean
-  isLoadingWalkThrough :boolean
+  recommendation: Recommendations[] | null
+  valuePropositions: ValuePropositions[] | null
+  walkthorugh: WalkThrough[] | null
+  isLoadingRecommendations: boolean
+  isLoadingValuePropositions: boolean
+  isLoadingWalkThrough: boolean
   conversationId: string | null
-  promptvalue:string | null
-  selectedBoat:string
-  selectedBrand:string
-  selectedTags:any
+  promptvalue: string | null
+  selectedBoat: string
+  selectedBrand: string
+  selectedTags: any
 }
 
 export type Action =
@@ -54,9 +56,9 @@ export type Action =
   | { type: 'FETCH_CHAT_HISTORY'; payload: Conversation[] | null }
   | { type: 'FETCH_FRONTEND_SETTINGS'; payload: FrontendSettings | null }
   | {
-      type: 'SET_FEEDBACK_STATE'
-      payload: { answerId: string; feedback: Feedback.Positive | Feedback.Negative | Feedback.Neutral }
-    }
+    type: 'SET_FEEDBACK_STATE'
+    payload: { answerId: string; feedback: Feedback.Positive | Feedback.Negative | Feedback.Neutral }
+  }
   | { type: 'GET_FEEDBACK_STATE'; payload: string }
   | { type: 'SET_RECOMMENDATIONS_STATE'; payload: Recommendations[] }
   | { type: 'SET_RECOMMENDATIONS_LOADING'; payload: boolean }
@@ -70,7 +72,7 @@ export type Action =
   | { type: 'SET_SELECTED_BRAND'; payload: string }
   | { type: 'SET_SELECTED_TAGS'; payload: any }
 
-  
+
 
 const initialState: AppState = {
   isChatHistoryOpen: false,
@@ -84,24 +86,24 @@ const initialState: AppState = {
   },
   frontendSettings: null,
   feedbackState: {},
-  recommendation:[],
-  valuePropositions:[],
-  walkthorugh:[],
-  isLoadingRecommendations:false,
-  isLoadingValuePropositions:false,
-  isLoadingWalkThrough:false,
+  recommendation: [],
+  valuePropositions: [],
+  walkthorugh: [],
+  isLoadingRecommendations: false,
+  isLoadingValuePropositions: false,
+  isLoadingWalkThrough: false,
   conversationId: null,
-  promptvalue:null,
-  selectedBoat:'',
-  selectedBrand:'',
-  selectedTags:[]
+  promptvalue: null,
+  selectedBoat: '',
+  selectedBrand: '',
+  selectedTags: []
 }
 
 export const AppStateContext = createContext<
   | {
-      state: AppState
-      dispatch: React.Dispatch<Action>
-    }
+    state: AppState
+    dispatch: React.Dispatch<Action>
+  }
   | undefined
 >(undefined)
 

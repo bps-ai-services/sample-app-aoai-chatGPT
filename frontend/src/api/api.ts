@@ -1,4 +1,4 @@
-import uuid from 'react-uuid'
+import { v4 as uuid } from 'uuid';
 import { chatHistorySampleData } from '../constants/chatHistory'
 
 import { ChatMessage, Conversation, ConversationRequest, CosmosDBHealth, CosmosDBStatus, UserInfo } from './models'
@@ -38,43 +38,7 @@ export const fetchChatHistoryInit = (): Conversation[] | null => {
 }
 
 export const historyList = async (offset = 0): Promise<Conversation[] | null> => {
-  const response = await fetch(`/history/list/fakecall?offset=${offset}`, {
-    method: 'GET'
-  })
-    .then(async res => {
-      const payload = await res.json()
-      if (!Array.isArray(payload)) {
-        console.error('There was an issue fetching your data.')
-        return null
-      }
-      const conversations: Conversation[] = await Promise.all(
-        payload.map(async (conv: any) => {
-          let convMessages: ChatMessage[] = []
-          convMessages = await historyRead(conv.id)
-            .then(res => {
-              return res
-            })
-            .catch(err => {
-              console.error('error fetching messages: ', err)
-              return []
-            })
-          const conversation: Conversation = {
-            id: conv.id,
-            title: conv.title,
-            date: conv.createdAt,
-            messages: convMessages
-          }
-          return conversation
-        })
-      )
-      return conversations
-    })
-    .catch(_err => {
-      console.error('There was an issue fetching your data.')
-      return null
-    })
-
-  return response
+  return null
 }
 
 export const historyRead = async (convId: string): Promise<ChatMessage[]> => {
@@ -355,8 +319,8 @@ export const historyMessageFeedback = async (messageId: string, feedback: string
   return response
 }
 
-export async function getRecommendations(payload: string,city:string,selectedTags:any): Promise<any> {
-  const prevId=uuid().toString();
+export async function getRecommendations(payload: string, city: string, selectedTags: any): Promise<any> {
+  const prevId = uuid();
 
   const data = {
     messages: [
@@ -364,8 +328,8 @@ export async function getRecommendations(payload: string,city:string,selectedTag
         id: prevId,
         role: 'user',
         content: payload,
-        city:city,
-        tags:selectedTags,
+        city: city,
+        tags: selectedTags,
         prompt_type: 1,
       },
     ],
@@ -380,21 +344,20 @@ export async function getRecommendations(payload: string,city:string,selectedTag
   });
 
   const jsonResponse = await response.json();
-  const historyData=[{
+  const historyData = [{
     id: prevId,
     role: "assistant",
     content: jsonResponse.messages,
     date: new Date().toISOString(),
-    conversation_id:jsonResponse.id
+    conversation_id: jsonResponse.id
   }]
-  console.log({jsonResponse,historyData})
 
-  historyUpdate(historyData,jsonResponse.id);
+  historyUpdate(historyData, jsonResponse.id);
   return jsonResponse;
 }
 
-export async function getValuePropositions(payload: string,conversationId:string): Promise<any> {
-  const prevId = uuid().toString()
+export async function getValuePropositions(payload: string, conversationId: string): Promise<any> {
+  const prevId = uuid()
   const data = {
     messages: [
       {
@@ -417,19 +380,19 @@ export async function getValuePropositions(payload: string,conversationId:string
   });
 
   const jsonResponse = await response.json();
-  const historyData=[{
+  const historyData = [{
     id: prevId,
     role: "assistant",
     content: jsonResponse.messages,
-    conversation_id:conversationId,
+    conversation_id: conversationId,
     date: new Date().toISOString()
   }]
-  historyUpdate(historyData,conversationId);
+  historyUpdate(historyData, conversationId);
   return jsonResponse;
 }
 
-export async function getWalkthroughData(payload: string,conversationId:string): Promise<any> {
-  const prevId = uuid().toString()
+export async function getWalkthroughData(payload: string, conversationId: string): Promise<any> {
+  const prevId = uuid()
   const data = {
     messages: [
       {
@@ -437,7 +400,7 @@ export async function getWalkthroughData(payload: string,conversationId:string):
         role: 'user',
         content: payload,
         prompt_type: 3,
-        conversation_id:conversationId,
+        conversation_id: conversationId,
 
       },
     ],
@@ -452,28 +415,28 @@ export async function getWalkthroughData(payload: string,conversationId:string):
   });
 
   const jsonResponse = await response.json();
-  const historyData=[{
+  const historyData = [{
     id: prevId,
     role: "assistant",
     content: jsonResponse.messages,
-    conversation_id:conversationId,
+    conversation_id: conversationId,
     date: new Date().toISOString()
   }]
-  historyUpdate(historyData,conversationId);
+  historyUpdate(historyData, conversationId);
   return jsonResponse;
 }
 
-export async function sendFeedback(feedbackInput:string,feedback:string,conversationId:string): Promise<any> {
-  const prevId = uuid().toString()
+export async function sendFeedback(feedbackInput: string, feedback: string, conversationId: string): Promise<any> {
+  const prevId = uuid()
   const data = {
     messages: [
       {
         id: prevId,
         role: 'user',
         content: "",
-        conversation_id:conversationId,
-        conversation_feedback:feedback,
-        conversation_feedback_message:feedbackInput
+        conversation_id: conversationId,
+        conversation_feedback: feedback,
+        conversation_feedback_message: feedbackInput
       },
     ],
   };

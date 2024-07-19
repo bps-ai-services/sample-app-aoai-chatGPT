@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Stack, TextField, IconButton, PrimaryButton, ComboBox, IComboBoxOption, IComboBox } from '@fluentui/react';
-import uuid from 'react-uuid';
+import { v4 as uuid } from 'uuid';
 import style from "../../pages/layout/Layout.module.css"
 import { Send24Filled, Send28Filled } from '@fluentui/react-icons';
 import { useEffect, useState } from 'react';
@@ -86,7 +86,7 @@ const UserInfo: React.FC = () => {
     "GAINESVILLE, FL",
     "DAYTONA, FL",
     "ISLAMORADA, FL",
-      ]
+  ]
 
   return (
     <Stack horizontalAlign='center'
@@ -108,7 +108,7 @@ const UserInfo: React.FC = () => {
           alignItems: "center",
           flexDirection: "column",
           width: "100%",
-          gap:"10px",
+          gap: "10px",
           padding: "0px 20px"
         }}>
         {/* <div className={style.comboBoxField}>
@@ -132,7 +132,7 @@ const UserInfo: React.FC = () => {
             />
           </div>
         </div> */}
-        <CityAutocompleteInput suggestions={suggestions} setSelectedValue={setInputValue} selectedValue={inputValue===""} handleSave={handleSave}/>
+        <CityAutocompleteInput suggestions={suggestions} setSelectedValue={setInputValue} selectedValue={inputValue === ""} handleSave={handleSave} />
         {/* <PrimaryButtonComponent onClick={handleSave} label='Submit' disabled={inputValue===""} width='300px'/> */}
         {/* <div className={style.userinputField}>
           <div style={textFieldWrapperStyle}>

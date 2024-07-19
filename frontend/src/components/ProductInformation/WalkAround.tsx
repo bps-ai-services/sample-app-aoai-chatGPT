@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import CarouselComponent from '../CarouselComponent';
-import uuid from 'react-uuid';
+import { v4 as uuid } from 'uuid';
 import { AppStateContext } from '../../state/AppProvider';
 import Card from '../Card';
 import loading from "../../assets/loader.gif"
@@ -26,9 +26,7 @@ const WalkAround: React.FC = () => {
   return (
     <>
       {isLoading ? (
-        // <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "calc(100vh - 100px)" }}>
-          <img src={loading} alt="Logo" className="logo" style={{opacity:"0.3",width:"300px"}} />
-        // </div>
+        <img src={loading} alt="Logo" className="logo" style={{ opacity: "0.3", width: "300px" }} />
       ) : (
         <>
           {walkthroughData && walkthroughData?.length > 0 ? (

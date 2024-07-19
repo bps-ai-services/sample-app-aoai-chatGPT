@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter, HashRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { initializeIcons } from '@fluentui/react'
 
 import Chat from './pages/chat/Chat'
@@ -14,7 +13,6 @@ import Recommendations from './components/Recommendations/Recommendations'
 import ProductInformation from './components/ProductInformation/ProductInformation'
 import Feedback from './components/Feedback/Feedback'
 import PreventBackNavigation from './components/common/PreventBackNavigation'
-import ReactGA from 'react-ga4';
 import MSClarityScript from './msclaritytag'
 
 import { PublicClientApplication } from '@azure/msal-browser';
@@ -23,31 +21,21 @@ import { MsalProvider } from '@azure/msal-react';
 import { useMsal, useMsalAuthentication } from '@azure/msal-react';
 import { InteractionType } from '@azure/msal-browser';
 
-
 const msalInstance = new PublicClientApplication(msalConfig);
 
 initializeIcons()
 
 export default function App() {
 
-  useMsalAuthentication(InteractionType.Redirect);
+  //useMsalAuthentication(InteractionType.Redirect);
   const { accounts } = useMsal();
   const username = accounts[0] ? accounts[0].username : "";
 
-  
-  // const GA_TRACKING_ID = 'G-L0S6VRT5BT'; // Replace with your Google Analytics tracking ID
-  
-  // useEffect(() => {
-  //   ReactGA.initialize(GA_TRACKING_ID);
-  //   // Send pageview with a custom path
-  //   ReactGA.send({ hitType: "pageview", page: window.location.pathname });
-  // }, [])
-    
   return (
     <AppStateProvider>
-    <MSClarityScript />
+      <MSClarityScript />
       <BrowserRouter>
-      <PreventBackNavigation />
+        <PreventBackNavigation />
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Chat />} />
@@ -55,8 +43,6 @@ export default function App() {
             <Route path='recommendations' element={<Recommendations />} />
             <Route path='productInfo' element={<ProductInformation />} />
             <Route path='feedback' element={<Feedback />} />
-
-
             <Route path="*" element={<NoPage />} />
           </Route>
         </Routes>
@@ -70,12 +56,8 @@ export default function App() {
   )
 }
 
-
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  // <React.StrictMode>
-  <MsalProvider instance={msalInstance}>
-
-    <App />
-  </MsalProvider>
-  // </React.StrictMode>
+  // <MsalProvider instance={msalInstance}>
+  <App />
+  // </MsalProvider>
 )

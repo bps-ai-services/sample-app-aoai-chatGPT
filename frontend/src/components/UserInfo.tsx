@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Stack, TextField, IconButton } from '@fluentui/react';
-import { Send24Regular, ChevronRight24Regular } from '@fluentui/react-icons';
 
 interface InputWithIconProps {
     iconType: 'send' | 'navigate';
