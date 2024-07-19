@@ -116,46 +116,6 @@ def initialize_logging():
 # Initialize logging once
 logger = initialize_logging()
 
-
-# def initialize_logging():
-#     global logging_initialized
-#     if not logging_initialized:
-#         if DEBUG.lower() == "true":
-#             # Configure Azure Monitor
-#             configure_azure_monitor(
-#                 connection_string=app_insight_conn_key,
-#                 logger_name="azure_application_logger",
-#             )
-#             # Get and configure logger
-#             logger = logging.getLogger("azure_application_logger")
-#             logger.setLevel(INFO)
-#             logging_initialized = True
-#             return logger
-#         else:
-#             return None
-#             # # Default logger if not in debug mode
-#             # logger = logging.getLogger()
-#             # logger.setLevel(logging.INFO)
-#             # return logger
-
-# # Initialize logging once
-# logger = initialize_logging()
-
-
-# global logging_initialized
-# logging_initialized = False
-
-# if DEBUG.lower() == "true":
-#     if not logging_initialized:
-#         #logging.basicConfig(level=logging.DEBUG)
-#         configure_azure_monitor(
-#         connection_string=app_insight_conn_key,
-#         logger_name="azure_application_logger",)
-#         logging = getLogger("azure_application_logger")
-#         logging.setLevel(INFO)
-
-#         logging_initialized = True
-
 tracer = trace.get_tracer(__name__, tracer_provider=get_tracer_provider())
 
 
@@ -177,6 +137,8 @@ frontend_settings = {
         "show_share_button": app_settings.ui.show_share_button,
     },
     "sanitize_answer": app_settings.base_settings.sanitize_answer,
+    "boat_specialist_api_version": app_settings.base_settings.boat_specialist_api_version,
+    "client_app_version": app_settings.base_settings.client_app_version
 }
 
 

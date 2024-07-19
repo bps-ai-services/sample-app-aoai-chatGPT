@@ -687,6 +687,8 @@ class _BaseSettings(BaseSettings):
     sanitize_answer: bool = False
     use_promptflow: bool = False
     applicationinsights_connection_string: str = ""
+    boat_specialist_api_version: str = ""
+    client_app_version: str = ""
 
 
 class _AppSettings(BaseModel):

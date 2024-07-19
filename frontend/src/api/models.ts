@@ -115,7 +115,9 @@ export type FrontendSettings = {
   auth_enabled?: string | null
   feedback_enabled?: string | null
   ui?: UI
-  sanitize_answer?: boolean
+  sanitize_answer?: boolean,
+  boat_specialist_api_version?: string,
+  client_app_version?: string,
 }
 
 export enum Feedback {

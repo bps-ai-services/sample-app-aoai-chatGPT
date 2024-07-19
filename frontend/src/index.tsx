@@ -1,3 +1,4 @@
+import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { initializeIcons } from '@fluentui/react'
@@ -9,9 +10,9 @@ import { AppStateProvider } from './state/AppProvider'
 
 import './index.css'
 import InputLevel2 from './components/Home/InputLevel2'
-import Recommendations from './components/Recommendations/Recommendations'
-import ProductInformation from './components/ProductInformation/ProductInformation'
-import Feedback from './components/Feedback/Feedback'
+const Recommendations = React.lazy(() => import('./components/Recommendations/Recommendations'));
+const ProductInformation = React.lazy(() => import('./components/ProductInformation/ProductInformation'));
+const Feedback = React.lazy(() => import('./components/Feedback/Feedback'));
 import PreventBackNavigation from './components/common/PreventBackNavigation'
 import MSClarityScript from './msclaritytag'
 
