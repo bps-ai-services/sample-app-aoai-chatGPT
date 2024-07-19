@@ -27,7 +27,7 @@ initializeIcons()
 
 export default function App() {
 
-  //useMsalAuthentication(InteractionType.Redirect);
+  useMsalAuthentication(InteractionType.Redirect);
   const { accounts } = useMsal();
   const username = accounts[0] ? accounts[0].username : "";
 
@@ -57,7 +57,7 @@ export default function App() {
 }
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  // <MsalProvider instance={msalInstance}>
-  <App />
-  // </MsalProvider>
+  <MsalProvider instance={msalInstance}>
+    <App />
+  </MsalProvider>
 )
