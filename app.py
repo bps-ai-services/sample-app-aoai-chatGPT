@@ -1,5 +1,3 @@
-from azure.identity import ClientSecretCredential
-from msgraph import GraphServiceClient
 import copy
 import json
 import os
