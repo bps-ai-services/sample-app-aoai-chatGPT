@@ -1,2 +1,0 @@
-import{j as t,t as a}from"./index-CMg25iEq.js";import{d as i}from"./PrimaryButtonComponent-6kZX-vu_.js";const e="/assets/loader-C9r3yE00.gif",r={iconName:"Back",styles:{root:{padding:"8px 36px",background:"#2f3a40",marginTop:4,marginRight:40,borderRadius:"50px",fontWeight:"bold",fontSize:"16px",color:"#FFFFFF",cursor:"pointer","@media (max-width: 767px)":{fontSize:"16px",marginRight:20}}}},c=({onClick:o})=>t.jsx(a,{className:i.backButton,...r,onClick:o});export{c as B,e as l};
-//# sourceMappingURL=BackButton-DRlowvTU.js.map

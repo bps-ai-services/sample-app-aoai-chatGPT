@@ -11,6 +11,7 @@ export default defineConfig({
     sourcemap: true
   },
   server: {
+    port: 5174, // Replace with your desired port number
     proxy: {
 
       '/ask': 'http://localhost:5000',
@@ -26,8 +27,8 @@ export default defineConfig({
       '/v3/history/generate': 'http://127.0.0.1:5000',
       '/v3/conversation': 'http://127.0.0.1:5000',
       '/v3/history/conversation_feedback': 'http://127.0.0.1:5000',
-      '/ref/states': 'http://127.0.0.1:50505',
-      '/ref/cities': 'http://127.0.0.1:50505'
+      // '/ref/states': 'http://127.0.0.1:50505',
+      // '/ref/cities': 'http://127.0.0.1:50505'
     }
   }
 })
