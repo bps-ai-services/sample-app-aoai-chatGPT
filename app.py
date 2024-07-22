@@ -16,6 +16,9 @@ from quart import (
     render_template,
 )
 
+
+from logging import INFO, getLogger
+
 from openai import AsyncAzureOpenAI
 from azure.identity.aio import (
     DefaultAzureCredential,
@@ -1625,72 +1628,7 @@ async def add_conversation_feedback_v3():
         logger.error(f"Exception in send_chat_request : {e}")
         # logging.exception("Exception in /history/conversation_feedback")
         return jsonify({"error": str(e)}), 500
+    
 
-
-async def get_user_details(user_id):
-
-    CLIENT_ID = '3bf00fa6-49f1-42ad-9317-b5a7cb68beab'
-    TENANT_ID = '035c9b6a-9ba7-4804-a377-482ed2642e72'
-    # AUTHORITY = f'https://login.microsoftonline.com/{TENANT_ID}'
-    SCOPE = ['https://graph.microsoft.com/.default']
-
-    AUTH_CLIENT_SECRET = os.environ.get("AUTH_CLIENT_SECRET", "")
-
-    # Create the credential object
-    credentials = ClientSecretCredential(
-        TENANT_ID, CLIENT_ID, AUTH_CLIENT_SECRET)
-
-    # Initialize the Graph client
-    graph_client = GraphServiceClient(credentials, SCOPE)
-
-    # Fetch user details
-    # await graph_client.users.by_user_id(user_id).get()
-    me = await graph_client.me.get()
-
-    print(f"User Display Name: {me.display_name}")
-    print(f"User Email: {me.mail or me.user_principal_name}")
-    print(f"User State: {me.state}")
-    print(f"User Country: {me.country}")
-
-    return me
-
-# @bp.route("/get_user_state_via_ms_graph", methods=["POST"])
-
-
-async def get_user_state_via_ms_graph():
-    authenticated_user = get_authenticated_user_details(
-        request_headers=request.headers)
-    user_id = authenticated_user["user_principal_id"]
-
-    logger.error(f'user_id: {user_id}')
-    logger.error("calling receive get_user_state_via_ms_graph()")
-
-    AUTH_CLIENT_SECRET = os.environ.get("AUTH_CLIENT_SECRET", "")
-
-    logger.error(f"AUTH_CLIENT_SECRET: {AUTH_CLIENT_SECRET}")
-
-    try:
-
-        # Fetch user details
-        # graph_client.users.by_user_id(user_id).get()
-        user_details = await get_user_details(user_id)
-
-        logger.error(f"user_details: {user_details}")
-
-        # display_name = user_details.get('displayName')
-        # email = user_details.get('mail')
-        # state = user_details.get('state')
-        # country = user_details.get('country')  # or use 'countryOrRegion' based on your Azure AD configuration
-
-        # logger.error(f"User Display Name: {display_name}")
-        # logger.error(f"User Email: {email}")
-        # logger.error(f"User state: {state}")
-        # logger.error(f"User country: {country}")
-
-        return None
-
-    except Exception as e:
-        logger.error(f"Unexpected error: {e}")
-        return None
 
 app = create_app()

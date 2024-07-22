@@ -28,7 +28,11 @@ interface UserInfo {
   id: string;
   name: string;
 }
-const Chat = () => {
+interface Props {
+  loginState:boolean
+}
+const Chat:React.FC<Props>= ({loginState=false}) => {
+  //console.log({loginState})
   const appStateContext = useContext(AppStateContext)
   const AUTH_ENABLED = appStateContext?.state.frontendSettings?.auth_enabled
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null)
@@ -39,6 +43,9 @@ const Chat = () => {
 
   const [ERROR] = ['error']
   const NO_CONTENT_ERROR = 'No content in messages object.'
+  const [loading, setLoading] = useState(true);
+
+  
 
   useEffect(() => {
     if (
@@ -128,16 +135,37 @@ const Chat = () => {
   const [showSplash, setShowSplash] = useState(true);
 
   const handleTimeout = () => {
-    setShowSplash(false);
+    setShowSplash(!loginState);
   };
 
-  useEffect(() => {
-    const userInfoFromLocalStorage = localStorage.getItem('userInfo');
-    if (userInfoFromLocalStorage) {
-      setUserInfo(JSON.parse(userInfoFromLocalStorage));
-    }
-  }, [])
+  // useEffect(() => {
+  //   const userInfoFromLocalStorage = localStorage.getItem('userInfo');
+  //   if (userInfoFromLocalStorage) {
+  //     setUserInfo(JSON.parse(userInfoFromLocalStorage));
+  //   }
+  //   setLoading(false); // Update loading state after fetching
+  // }, []);
+  // useEffect(() => {
+  //   const userInfoFromLocalStorage = localStorage.getItem('userInfo');
+  //   if (userInfoFromLocalStorage) {
+  //     setUserInfo(JSON.parse(userInfoFromLocalStorage));
 
+  //   }
+  // }, [])
+  const [isDatainLocalStorage,setIsDataInLocalStorage]=useState(null)
+  useEffect(()=>{
+    const storeuserinfo=localStorage.getItem("userInfo");
+    let storageval;
+    if(storeuserinfo){
+        storageval=JSON.parse(storeuserinfo);
+
+        setIsDataInLocalStorage(storageval[0].city)
+    } 
+
+  },[])
+  console.log({isDatainLocalStorage})
+
+  console.log("userInfo ->chat", userInfo)
   return (
     <div className={styles.container} role="main">
       {showAuthMessage ? (
@@ -169,11 +197,11 @@ const Chat = () => {
         </Stack>
       ) : (
         <div className={styles.chatContainer}>
-          {showSplash ? (
+          {!loginState ? (
             <SplashScreen logo={logo} duration={500} onTimeout={handleTimeout} />
           ) : (
             <>
-              {userInfo && userInfo.length > 0 ? (
+              {isDatainLocalStorage!==null ? (
                 <Home />
               ) : (
                 <UserInfo />

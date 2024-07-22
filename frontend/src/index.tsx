@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, HashRouter, Route, Routes, useLocation, useNavigate, useNavigation } from 'react-router-dom'
 import { initializeIcons } from '@fluentui/react'
 
 import Chat from './pages/chat/Chat'
@@ -15,31 +15,115 @@ const ProductInformation = React.lazy(() => import('./components/ProductInformat
 const Feedback = React.lazy(() => import('./components/Feedback/Feedback'));
 import PreventBackNavigation from './components/common/PreventBackNavigation'
 import MSClarityScript from './msclaritytag'
-
-import { PublicClientApplication } from '@azure/msal-browser';
-import { msalConfig } from './authConfig'
-import { MsalProvider } from '@azure/msal-react';
+import { AuthenticationResult, EventType, PublicClientApplication } from '@azure/msal-browser';
+import { graphConfig, loginRequest, msalConfig } from './auth/authConfig'
+import { AuthenticatedTemplate, MsalProvider, UnauthenticatedTemplate, useIsAuthenticated } from '@azure/msal-react';
 import { useMsal, useMsalAuthentication } from '@azure/msal-react';
 import { InteractionType } from '@azure/msal-browser';
-
-const msalInstance = new PublicClientApplication(msalConfig);
+import MsalProviderWrapper from './auth/MsalProviderWrapper'
+import SplashScreen from './components/SplashScreen'
+import logo from "../src/assets/logo.png"
+import { callMsGraph } from './auth/graph'
+import UserInfo from './components/UserInformation/UserInfo'
+import Home from './components/Home/Home'
 
 initializeIcons()
+
+interface UserInfo {
+  city: string;
+  state: string;
+}
 
 export default function App() {
 
   useMsalAuthentication(InteractionType.Redirect);
-  const { accounts } = useMsal();
-  const username = accounts[0] ? accounts[0].username : "";
+
+  // const [showSplash, setShowSplash] = useState(true);
+  // const handleTimeout = () => {
+  //   setShowSplash(false);
+  // };
+
+  const { instance, accounts } = useMsal();
+  const isAuthenticated = useIsAuthenticated();
+  //const [userProfile, setUserProfile] = useState(null);
+  const navigate = useNavigate();
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [renderLast,setRenderLast]=useState(false)
+  useEffect(() => {
+    if (isAuthenticated) {
+      instance.acquireTokenSilent({
+        ...loginRequest,
+        account: accounts[0]
+      })
+        .then(response => {
+          const accessToken = response.accessToken;
+
+          const headers = new Headers();
+          const bearer = `Bearer ${accessToken}`;
+
+          headers.append("Authorization", bearer);
+
+          const options = {
+            method: "GET",
+            headers: headers
+          };
+
+          fetch(graphConfig.graphMeEndpoint, options)
+            .then(response => response.json())
+            .then(data => {
+              const storedUserInfoString = localStorage.getItem("userInfo") || "";
+
+              if (storedUserInfoString) {
+                let storedUserInfo: UserInfo[] = [];
+                storedUserInfo = JSON.parse(storedUserInfoString) as UserInfo[];
+                  const city = storedUserInfo[0].city || null;
+                  const state = storedUserInfo[0].state || null;
+                  let userInfo = [{ state: state, city: city }];
+                  let userInfoString = JSON.stringify(userInfo);
+                  localStorage.setItem("userInfo", userInfoString);
+                  setRenderLast(true)
+                  setLoginSuccess(true)
+              }
+              else {
+                  const city = data.city  || "lahore";
+                  const state = data.state || data.province || "punjab";
+                  let userInfo = [{ state: state, city: city }];
+                  let userInfoString = JSON.stringify(userInfo);
+                  localStorage.setItem("userInfo", userInfoString);
+                  setRenderLast(true)
+
+                  setLoginSuccess(true)
+              }
+            })
+            .catch(error => console.log(error));
+        })
+        .catch(error => {
+          console.error('Token acquisition failed:', error);
+        });
+    }
+    // }, [isAuthenticated, instance, accounts, navigate]);
+  }, [isAuthenticated, instance, accounts]);
+
+  // const { accounts } = useMsal();
+  // const username = accounts[0] ? accounts[0].username : "";
+
+
+  // const GA_TRACKING_ID = 'G-L0S6VRT5BT'; // Replace with your Google Analytics tracking ID
+  // useEffect(() => {
+  //   ReactGA.initialize(GA_TRACKING_ID);
+  //   // Send pageview with a custom path
+  //   ReactGA.send({ hitType: "pageview", page: window.location.pathname });
+  // }, [])
 
   return (
     <AppStateProvider>
       <MSClarityScript />
-      <BrowserRouter>
-        <PreventBackNavigation />
+
+      <PreventBackNavigation />
+      <Suspense fallback={<div></div>}>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index element={<Chat />} />
+            <Route index element={renderLast &&<Chat loginState={loginSuccess} />} />
             <Route path='inputLevel2' element={<InputLevel2 />} />
             <Route path='recommendations' element={<Recommendations />} />
             <Route path='productInfo' element={<ProductInformation />} />
@@ -47,18 +131,18 @@ export default function App() {
             <Route path="*" element={<NoPage />} />
           </Route>
         </Routes>
-      </BrowserRouter>
-      {username && (
-        <div className="user-info">
-          User: {username}
-        </div>
-      )}
+      </Suspense>
+
     </AppStateProvider>
   )
 }
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <MsalProvider instance={msalInstance}>
-    <App />
-  </MsalProvider>
+  // <React.StrictMode>
+  <MsalProviderWrapper>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </MsalProviderWrapper>
+  // </React.StrictMode>
 )

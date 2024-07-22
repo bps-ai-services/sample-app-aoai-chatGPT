@@ -319,7 +319,7 @@ export const historyMessageFeedback = async (messageId: string, feedback: string
   return response
 }
 
-export async function getRecommendations(payload: string, city: string, selectedTags: any): Promise<any> {
+export async function getRecommendations(payload: string, city: string, state: string, selectedTags: any): Promise<any> {
   const prevId = uuid();
 
   const data = {
@@ -329,6 +329,7 @@ export async function getRecommendations(payload: string, city: string, selected
         role: 'user',
         content: payload,
         city: city,
+        state: state,
         tags: selectedTags,
         prompt_type: 1,
       },
@@ -452,14 +453,14 @@ export async function sendFeedback(feedbackInput: string, feedback: string, conv
   return response;
 }
 
-export async function getStates(): Promise<string[]> {
-  const response = await fetch('/ref/states');
-  const states = await response.json();
-  return states as string[];
-}
+// export async function getStates(): Promise<string[]> {
+//   const response = await fetch('/ref/states');
+//   const states = await response.json();
+//   return states as string[];
+// }
 
-export async function getCities(state: string | number): Promise<string[]> {
-  const response = await fetch(`/ref/cities?state=${state}`);
-  const cities = await response.json();
-  return cities as string[];
-}
+// export async function getCities(state: string | number): Promise<string[]> {
+//   const response = await fetch(`/ref/cities?state=${state}`);
+//   const cities = await response.json();
+//   return cities as string[];
+// }

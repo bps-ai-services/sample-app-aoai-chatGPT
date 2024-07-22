@@ -46,7 +46,7 @@ class CosmosConversationClient():
             
         return True, "CosmosDB client initialized successfully"
 
-    async def create_conversation(self, user_id, title = '', state= '' , city = '' , tags = ''):
+    async def create_conversation(self, user_id, title = '', state= '' , city = '' , user_ad_id = '' , tags = ''):
         conversation = {
             'id': str(uuid.uuid4()),  
             'type': 'conversation',
@@ -58,8 +58,8 @@ class CosmosConversationClient():
             'feedback_message' : '',
             'city' : city,
             'state' :state,
+            'user_ad_id': user_ad_id,
             'selectedtags':tags,
-
         }
         ## TODO: add some error handling based on the output of the upsert_item call
         resp = await self.container_client.upsert_item(conversation)  
