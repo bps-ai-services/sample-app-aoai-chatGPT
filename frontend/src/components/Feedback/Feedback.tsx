@@ -8,8 +8,6 @@ import style from "./Feedback.module.css";
 import homeStyle from "../Home/Home.module.css"
 import detailStyle from "../ProductInformation/ProductInfo.module.css"
 import PrimaryButtonComponent from '../common/PrimaryButtonComponent';
-import ReactGA from 'react-ga4';
-
 
 const Feedback: React.FC = () => {
     const [feedback, setFeedback] = useState<string>('');
@@ -49,12 +47,6 @@ const Feedback: React.FC = () => {
     };
 
     const handleSubmit = () => {
-
-        ReactGA.event({
-            category: 'Feedback Submit btn Click',
-            action: 'Click',
-            label: 'Feedback Submit btn Click',
-        });
 
         console.log(conversationId)
         sendFeedback(feedback, selectedButton, conversationId || "")

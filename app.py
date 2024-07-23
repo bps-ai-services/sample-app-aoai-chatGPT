@@ -88,6 +88,7 @@ def initialize_logging():
     global logging_initialized
     if not logging_initialized:
         if DEBUG.lower() == "true":
+            
             # Configure Azure Monitor
             configure_azure_monitor(
                 connection_string=app_settings.base_settings.applicationinsights_connection_string,
