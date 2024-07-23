@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import style from "./Home.module.css"
 import { AppStateContext } from '../../state/AppProvider';
 import { Send16Filled, Send24Filled, Send28Filled } from '@fluentui/react-icons';
-import ReactGA from 'react-ga4';
 
 interface Props {
   placeholder: string,
@@ -66,12 +65,6 @@ const DesktopTextField: React.FC<Props> = ({ placeholder, onButtonClick, text,se
     appStateContext?.dispatch({ type: 'SET_PROMPT_VALUE', payload: inputPayload })
     navigate("recommendations");
     setIsButtonClicked(false);
-
-    ReactGA.event({
-      category: 'Desktop Lets Go Btn',
-      action: 'Click',
-      label: 'Desktop Lets Go Btn',
-  });
 
   };
  

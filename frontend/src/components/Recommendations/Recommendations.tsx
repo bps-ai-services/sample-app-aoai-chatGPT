@@ -39,7 +39,6 @@ import SF22XP3 from  "../../assets/Caribou_BMT-6800_alt1.jpeg"
 import SF24XP3 from  "../../assets/Caribou_BMT-6801_main.avif"
 import SFB20 from  "../../assets/IndigoBlue_BMT-6795_main.jpeg"
 import PrimaryButtonComponent from '../common/PrimaryButtonComponent';
-import ReactGA from 'react-ga4';
 
 const boatImages: {[key:string]: string} = {
     "Regency 250 LE3": R250LE3,
@@ -215,12 +214,6 @@ const About: React.FC = () => {
             appStateContext?.dispatch({ type: 'SET_SELECTED_BOAT', payload: selectedItem.toUpperCase() })
             appStateContext?.dispatch({ type: 'SET_SELECTED_BRAND', payload: selectedProduct.toUpperCase() })
             
-            ReactGA.event({
-                category: 'Recommendation btn Click',
-                action: 'Click',
-                label: 'Recommendation btn Click',
-            });
-
             navigate("/productInfo");
 
 

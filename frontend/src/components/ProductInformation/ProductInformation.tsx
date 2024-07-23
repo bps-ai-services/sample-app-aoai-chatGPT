@@ -17,8 +17,6 @@ import { getValuePropositions, getWalkthroughData } from '../../api';
 import BackButton from '../BackButton';
 import style from './ProductInfo.module.css';
 import PrimaryButtonComponent from '../common/PrimaryButtonComponent';
-import ReactGA from 'react-ga4';
-
 
 const ProductInformation: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<string>('FlashCard');
@@ -104,13 +102,6 @@ const ProductInformation: React.FC = () => {
   };
 
   const handleNextClick = () => {
-    
-    ReactGA.event({
-      category: 'I"m Done btn Click',
-      action: 'Click',
-      label: 'I"m Done btn Click',
-  });
-
     navigate('/feedback');
   };
 
