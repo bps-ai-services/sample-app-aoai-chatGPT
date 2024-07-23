@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { MsalProvider } from "@azure/msal-react";
 import { PublicClientApplication } from "@azure/msal-browser";
-import { msalConfig } from "./authConfig";
+import { msalConfig } from "./authConf";
  
 const msalInstance = new PublicClientApplication(msalConfig);
  
