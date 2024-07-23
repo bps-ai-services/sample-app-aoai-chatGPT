@@ -14,7 +14,7 @@ export const msalConfig: Configuration = {
     auth: {
         clientId: '3bf00fa6-49f1-42ad-9317-b5a7cb68beab',
         authority: 'https://login.microsoftonline.com/035c9b6a-9ba7-4804-a377-482ed2642e72',
-        redirectUri: 'https://demo-wrmg-catalog-gpt4-dev.azurewebsites.net',
+        redirectUri: 'https://demo-wrmg-catalog-gpt4-dev.azurewebsites.net/',
          //redirectUri: 'http://localhost:5174',
     },
     cache: {
