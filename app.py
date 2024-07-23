@@ -1640,6 +1640,5 @@ async def add_conversation_feedback_v3():
         # logging.exception("Exception in /history/conversation_feedback")
         return jsonify({"error": str(e)}), 500
     
-# Create and run the Quart app
-if __name__ == "__main__":
-    app = create_app()
+
+app = create_app()
