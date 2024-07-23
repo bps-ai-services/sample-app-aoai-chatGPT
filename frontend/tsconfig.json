@@ -19,6 +19,6 @@
     "noUnusedLocals": false,
     "noImplicitAny": false
   },
-  "include": ["src"],
+  "include": ["src", "MsalProviderWrapper.tsx", "src/graph.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
