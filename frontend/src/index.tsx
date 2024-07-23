@@ -16,16 +16,16 @@ const Feedback = React.lazy(() => import('./components/Feedback/Feedback'));
 import PreventBackNavigation from './components/common/PreventBackNavigation'
 import MSClarityScript from './msclaritytag'
 import { AuthenticationResult, EventType, PublicClientApplication } from '@azure/msal-browser';
-import { graphConfig, loginRequest, msalConfig } from './auth/authConfig'
 import { AuthenticatedTemplate, MsalProvider, UnauthenticatedTemplate, useIsAuthenticated } from '@azure/msal-react';
 import { useMsal, useMsalAuthentication } from '@azure/msal-react';
 import { InteractionType } from '@azure/msal-browser';
-import MsalProviderWrapper from './auth/MsalProviderWrapper'
 import SplashScreen from './components/SplashScreen'
 import logo from "../src/assets/logo.png"
-import { callMsGraph } from './auth/graph'
+import { callMsGraph } from './graph'
 import UserInfo from './components/UserInformation/UserInfo'
 import Home from './components/Home/Home'
+import { graphConfig, loginRequest } from './authConfig'
+import MsalProviderWrapper from './MsalProviderWrapper'
 
 initializeIcons()
 
