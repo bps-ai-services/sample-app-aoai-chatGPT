@@ -58,7 +58,7 @@ class CosmosConversationClient():
             'feedback_message' : '',
             'city' : city,
             'state' :state,
-            'user_ad_id': user_ad_id,
+            'user_ad_id' :user_ad_id,
             'selectedtags':tags,
         }
         ## TODO: add some error handling based on the output of the upsert_item call

@@ -24,7 +24,8 @@ const enum messageStatus {
   Processing = 'Processing',
   Done = 'Done'
 }
-interface UserInfo {
+
+interface UserInfoModel {
   id: string;
   name: string;
 }
@@ -163,9 +164,10 @@ const Chat:React.FC<Props>= ({loginState=false}) => {
     } 
 
   },[])
-  console.log({isDatainLocalStorage})
 
-  console.log("userInfo ->chat", userInfo)
+  //console.log({isDatainLocalStorage})
+  //console.log("userInfo ->chat", userInfo)
+ 
   return (
     <div className={styles.container} role="main">
       {showAuthMessage ? (

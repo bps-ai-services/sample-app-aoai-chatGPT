@@ -9,11 +9,18 @@ import CityAutocompleteInput from '../common/CityAutoComplete';
 import PrimaryButtonComponent from '../common/PrimaryButtonComponent';
 import { useNavigate } from 'react-router-dom';
 
+
+interface UserInfo {
+  city: string;
+  state: string;
+  user_ad_id : string;
+}
+
 const UserInfo: React.FC = () => {
   const [states, setStates] = useState<IComboBoxOption[]>([]);
   const [cities, setCities] = useState<IComboBoxOption[]>([]);
   const [selectedState, setSelectedState] = useState<string | undefined>();
-  
+
   const textFieldStyle: React.CSSProperties = {
     flex: 1,
     border: 'none',
@@ -42,11 +49,21 @@ const UserInfo: React.FC = () => {
   const handleSave = () => {
     let cityname = ""
     let statename = ""
-    const StateCity = inputValue.split(',');
-    cityname = StateCity[0]  || ""
-    statename = StateCity[1] || ""
+    let user_ad_id = ""
 
-    const dataToSave = { state : statename, city: cityname};
+    const StateCity = inputValue.split(',');
+    cityname = StateCity[0] || ""
+    statename = StateCity[1] || ""
+    
+    //get the store user_ad_id from localStorage
+    const storedUserInfoString = localStorage.getItem("userInfo") || "";
+    if (storedUserInfoString) {
+      let storedUserInfo: UserInfo[] = [];
+      storedUserInfo = JSON.parse(storedUserInfoString) as UserInfo[];
+      user_ad_id = storedUserInfo[0].user_ad_id ;
+    }
+
+    const dataToSave = { state: statename, city: cityname, user_ad_id: user_ad_id };
     console.log("dataToSave", dataToSave)
 
     localStorage.setItem('userInfo', JSON.stringify([dataToSave]));

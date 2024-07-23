@@ -22,7 +22,7 @@ import { InteractionType } from '@azure/msal-browser';
 import SplashScreen from './components/SplashScreen'
 import logo from "../src/assets/logo.png"
 import { callMsGraph } from './graph'
-import UserInfo from './components/UserInformation/UserInfo'
+//import UserInfo from './components/UserInformation/UserInfo'
 import Home from './components/Home/Home'
 import { graphConfig, loginRequest } from './authConf'
 import MsalProviderWrapper from './MsalProviderWrapper'
@@ -32,6 +32,7 @@ initializeIcons()
 interface UserInfo {
   city: string;
   state: string;
+  user_ad_id : string;
 }
 
 export default function App() {
@@ -78,7 +79,8 @@ export default function App() {
                 storedUserInfo = JSON.parse(storedUserInfoString) as UserInfo[];
                   const city = storedUserInfo[0].city || null;
                   const state = storedUserInfo[0].state || null;
-                  let userInfo = [{ state: state, city: city }];
+                  const user_ad_id = storedUserInfo[0].user_ad_id || null;
+                  let userInfo = [{ state: state, city: city , user_ad_id:user_ad_id}];
                   let userInfoString = JSON.stringify(userInfo);
                   localStorage.setItem("userInfo", userInfoString);
                   setRenderLast(true)
@@ -87,7 +89,8 @@ export default function App() {
               else {
                   const city = data.city  || null;
                   const state = data.state || data.province || null;
-                  let userInfo = [{ state: state, city: city }];
+                  const user_ad_id = data.id || null;
+                  let userInfo = [{ state: state, city: city , user_ad_id : user_ad_id}];
                   let userInfoString = JSON.stringify(userInfo);
                   localStorage.setItem("userInfo", userInfoString);
                   setRenderLast(true)
