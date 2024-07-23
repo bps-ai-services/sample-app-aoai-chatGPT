@@ -2,7 +2,6 @@ import copy
 import json
 import os
 import logging
-import sys
 import uuid
 import httpx
 from quart import (
@@ -55,10 +54,12 @@ logging_initialized = False
 
 def initialize_logging():
     global logging_initialized
-    frame = sys._getframe().f_back
     if not logging_initialized:
         if DEBUG.lower() == "true":
             
+             # Set up the basic configuration for logging
+            logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
             # Configure Azure Monitor
             configure_azure_monitor(
                 connection_string=app_settings.base_settings.applicationinsights_connection_string,
@@ -68,9 +69,6 @@ def initialize_logging():
             # Get and configure logger
             logger = logging.getLogger("azure_application_logger")
             logger.setLevel(logging.INFO)
-
-            logger.info(f"Initializing logging (called from {frame.f_code.co_filename}:{frame.f_lineno})")
-
 
             # Prevent multiple handlers
             if not logger.hasHandlers():
@@ -82,18 +80,16 @@ def initialize_logging():
 
             # Debug print to check handlers
             logger.info(f"Logger Handlers after initialization:{logger.handlers}")
-
+            
             # Instrument logging with OpenTelemetry
             LoggingInstrumentor().instrument(set_logging_format=True)
 
             # Set the flag to indicate logging has been initialized
             logging_initialized = True
-            logger.info("Logging initialized")
             return logger
         else:
             return None
     else:
-        logger.info("Logging already initialized")
         return logging.getLogger("azure_application_logger")
 
 # Initialize logging once
@@ -1640,5 +1636,6 @@ async def add_conversation_feedback_v3():
         # logging.exception("Exception in /history/conversation_feedback")
         return jsonify({"error": str(e)}), 500
     
+
 
 app = create_app()
