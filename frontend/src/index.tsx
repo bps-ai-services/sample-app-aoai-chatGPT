@@ -24,7 +24,7 @@ import logo from "../src/assets/logo.png"
 import { callMsGraph } from './graph'
 import UserInfo from './components/UserInformation/UserInfo'
 import Home from './components/Home/Home'
-import { graphConfig, loginRequest } from './authConfig'
+import { graphConfig, loginRequest } from './authConf'
 import MsalProviderWrapper from './MsalProviderWrapper'
 
 initializeIcons()
@@ -85,8 +85,8 @@ export default function App() {
                   setLoginSuccess(true)
               }
               else {
-                  const city = data.city  || "lahore";
-                  const state = data.state || data.province || "punjab";
+                  const city = data.city  || null;
+                  const state = data.state || data.province || null;
                   let userInfo = [{ state: state, city: city }];
                   let userInfoString = JSON.stringify(userInfo);
                   localStorage.setItem("userInfo", userInfoString);
