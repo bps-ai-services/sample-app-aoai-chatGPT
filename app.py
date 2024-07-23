@@ -13,10 +13,6 @@ from quart import (
     send_from_directory,
     render_template,
 )
-
-
-from logging import INFO, getLogger
-
 from openai import AsyncAzureOpenAI
 from azure.identity.aio import (
     DefaultAzureCredential,
@@ -47,8 +43,61 @@ from opentelemetry.trace import (
 )
 from opentelemetry.propagate import extract
 
+
+
+
+# Debug settings
+DEBUG = os.environ.get("DEBUG", "false")
+
+# Ensure logging_initialized is defined globally
+logging_initialized = False
+
+def initialize_logging():
+    global logging_initialized
+    if not logging_initialized:
+        if DEBUG.lower() == "true":
+            
+            # Configure Azure Monitor
+            configure_azure_monitor(
+                connection_string=app_settings.base_settings.applicationinsights_connection_string,
+                logger_name="azure_application_logger",
+            )
+
+            # Get and configure logger
+            logger = logging.getLogger("azure_application_logger")
+            logger.setLevel(logging.INFO)
+
+            # Prevent multiple handlers
+            if not logger.hasHandlers():
+                handler = logging.StreamHandler()  # or another handler suitable for your needs
+                formatter = logging.Formatter(
+                    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+                handler.setFormatter(formatter)
+                logger.addHandler(handler)
+
+            # Debug print to check handlers
+            logger.info(f"Logger Handlers after initialization:{logger.handlers}")
+
+            # Instrument logging with OpenTelemetry
+            LoggingInstrumentor().instrument(set_logging_format=True)
+
+            # Set the flag to indicate logging has been initialized
+            logging_initialized = True
+            logger.info("Logging initialized")
+            return logger
+        else:
+            return None
+    else:
+        logger.info("Logging already initialized")
+        return logging.getLogger("azure_application_logger")
+
+# Initialize logging once
+logger = initialize_logging()
+
+tracer = trace.get_tracer(__name__, tracer_provider=get_tracer_provider())
+
 bp = Blueprint("routes", __name__, static_folder="static",
-               template_folder="static")
+template_folder="static")
 
 
 def create_app():
@@ -76,49 +125,6 @@ async def favicon():
 async def assets(path):
     return await send_from_directory("static/assets", path)
 
-# Debug settings
-DEBUG = os.environ.get("DEBUG", "false")
-
-
-# Global variable to track logging initialization
-logging_initialized = False
-
-
-def initialize_logging():
-    global logging_initialized
-    if not logging_initialized:
-        if DEBUG.lower() == "true":
-            
-            # Configure Azure Monitor
-            configure_azure_monitor(
-                connection_string=app_settings.base_settings.applicationinsights_connection_string,
-                logger_name="azure_application_logger",
-            )
-            # Get and configure logger
-            logger = logging.getLogger("azure_application_logger")
-            logger.setLevel(logging.INFO)
-
-            # Prevent multiple handlers
-            if not logger.hasHandlers():
-                handler = logging.StreamHandler()  # or another handler suitable for your needs
-                formatter = logging.Formatter(
-                    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-                handler.setFormatter(formatter)
-                logger.addHandler(handler)
-
-            # Instrument logging with OpenTelemetry
-            LoggingInstrumentor().instrument(set_logging_format=True)
-
-            logging_initialized = True
-            return logger
-        else:
-            return None
-
-
-# Initialize logging once
-logger = initialize_logging()
-
-tracer = trace.get_tracer(__name__, tracer_provider=get_tracer_provider())
 
 
 USER_AGENT = "GitHubSampleWebApp/AsyncAzureOpenAI/1.0.0"
@@ -1629,6 +1635,5 @@ async def add_conversation_feedback_v3():
         # logging.exception("Exception in /history/conversation_feedback")
         return jsonify({"error": str(e)}), 500
     
-
 
 app = create_app()
