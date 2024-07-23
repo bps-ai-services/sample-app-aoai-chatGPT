@@ -2,6 +2,7 @@ import copy
 import json
 import os
 import logging
+import sys
 import uuid
 import httpx
 from quart import (
@@ -54,6 +55,7 @@ logging_initialized = False
 
 def initialize_logging():
     global logging_initialized
+    frame = sys._getframe().f_back
     if not logging_initialized:
         if DEBUG.lower() == "true":
             
@@ -66,6 +68,9 @@ def initialize_logging():
             # Get and configure logger
             logger = logging.getLogger("azure_application_logger")
             logger.setLevel(logging.INFO)
+
+            logger.info(f"Initializing logging (called from {frame.f_code.co_filename}:{frame.f_lineno})")
+
 
             # Prevent multiple handlers
             if not logger.hasHandlers():
@@ -1635,5 +1640,6 @@ async def add_conversation_feedback_v3():
         # logging.exception("Exception in /history/conversation_feedback")
         return jsonify({"error": str(e)}), 500
     
-
-app = create_app()
+# Create and run the Quart app
+if __name__ == "__main__":
+    app = create_app()
