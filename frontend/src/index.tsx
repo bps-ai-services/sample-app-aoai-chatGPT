@@ -19,12 +19,8 @@ import { AuthenticationResult, EventType, PublicClientApplication } from '@azure
 import { AuthenticatedTemplate, MsalProvider, UnauthenticatedTemplate, useIsAuthenticated } from '@azure/msal-react';
 import { useMsal, useMsalAuthentication } from '@azure/msal-react';
 import { InteractionType } from '@azure/msal-browser';
-import SplashScreen from './components/SplashScreen'
-import logo from "../src/assets/logo.png"
-import { callMsGraph } from './graph'
-//import UserInfo from './components/UserInformation/UserInfo'
-import Home from './components/Home/Home'
 import { graphConfig, loginRequest } from './authConf'
+import ReactGA from 'react-ga4';
 import MsalProviderWrapper from './MsalProviderWrapper'
 
 initializeIcons()
@@ -38,11 +34,6 @@ interface UserInfo {
 export default function App() {
 
   useMsalAuthentication(InteractionType.Redirect);
-
-  // const [showSplash, setShowSplash] = useState(true);
-  // const handleTimeout = () => {
-  //   setShowSplash(false);
-  // };
 
   const { instance, accounts } = useMsal();
   const isAuthenticated = useIsAuthenticated();
@@ -104,11 +95,7 @@ export default function App() {
           console.error('Token acquisition failed:', error);
         });
     }
-    // }, [isAuthenticated, instance, accounts, navigate]);
   }, [isAuthenticated, instance, accounts]);
-
-  // const { accounts } = useMsal();
-  // const username = accounts[0] ? accounts[0].username : "";
 
 
   // const GA_TRACKING_ID = 'G-L0S6VRT5BT'; // Replace with your Google Analytics tracking ID
@@ -120,7 +107,7 @@ export default function App() {
 
   return (
     <AppStateProvider>
-      <MSClarityScript />
+      {/* <MSClarityScript />  */}
 
       <PreventBackNavigation />
       <Suspense fallback={<div></div>}>
