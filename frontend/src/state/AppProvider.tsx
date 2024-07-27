@@ -39,7 +39,8 @@ export interface AppState {
   promptvalue: string | null
   selectedBoat: string
   selectedBrand: string
-  selectedTags: any
+  selectedTags: any,
+  traits: string | null
 }
 
 export type Action =
@@ -68,6 +69,7 @@ export type Action =
   | { type: 'SET_WALKTHROUGH_LOADING'; payload: boolean }
   | { type: 'SET_CONVERSATION_ID'; payload: string }
   | { type: 'SET_PROMPT_VALUE'; payload: string }
+  | { type: 'SET_TRAITS_VALUE'; payload: string }
   | { type: 'SET_SELECTED_BOAT'; payload: string }
   | { type: 'SET_SELECTED_BRAND'; payload: string }
   | { type: 'SET_SELECTED_TAGS'; payload: any }
@@ -96,7 +98,8 @@ const initialState: AppState = {
   promptvalue: null,
   selectedBoat: '',
   selectedBrand: '',
-  selectedTags: []
+  selectedTags: [],
+  traits: null
 }
 
 export const AppStateContext = createContext<

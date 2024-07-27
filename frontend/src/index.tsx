@@ -10,8 +10,8 @@ import { AppStateProvider } from './state/AppProvider'
 
 import './index.css'
 import InputLevel2 from './components/Home/InputLevel2'
-const Recommendations = React.lazy(() => import('./components/Recommendations/Recommendations'));
-const ProductInformation = React.lazy(() => import('./components/ProductInformation/ProductInformation'));
+import Recommendations from './components/Recommendations/Recommendations'
+import ProductInformation from './components/ProductInformation/ProductInformation'
 const Feedback = React.lazy(() => import('./components/Feedback/Feedback'));
 import PreventBackNavigation from './components/common/PreventBackNavigation'
 import MSClarityScript from './msclaritytag'
@@ -28,7 +28,7 @@ initializeIcons()
 interface UserInfo {
   city: string;
   state: string;
-  user_ad_id : string;
+  user_ad_id: string;
 }
 
 export default function App() {
@@ -40,7 +40,7 @@ export default function App() {
   //const [userProfile, setUserProfile] = useState(null);
   const navigate = useNavigate();
   const [loginSuccess, setLoginSuccess] = useState(false);
-  const [renderLast,setRenderLast]=useState(false)
+  const [renderLast, setRenderLast] = useState(false)
   useEffect(() => {
     if (isAuthenticated) {
       instance.acquireTokenSilent({
@@ -68,25 +68,25 @@ export default function App() {
               if (storedUserInfoString) {
                 let storedUserInfo: UserInfo[] = [];
                 storedUserInfo = JSON.parse(storedUserInfoString) as UserInfo[];
-                  const city = storedUserInfo[0].city || null;
-                  const state = storedUserInfo[0].state || null;
-                  const user_ad_id = storedUserInfo[0].user_ad_id || null;
-                  let userInfo = [{ state: state, city: city , user_ad_id:user_ad_id}];
-                  let userInfoString = JSON.stringify(userInfo);
-                  localStorage.setItem("userInfo", userInfoString);
-                  setRenderLast(true)
-                  setLoginSuccess(true)
+                const city = storedUserInfo[0].city || null;
+                const state = storedUserInfo[0].state || null;
+                const user_ad_id = storedUserInfo[0].user_ad_id || null;
+                let userInfo = [{ state: state, city: city, user_ad_id: user_ad_id }];
+                let userInfoString = JSON.stringify(userInfo);
+                localStorage.setItem("userInfo", userInfoString);
+                setRenderLast(true)
+                setLoginSuccess(true)
               }
               else {
-                  const city = data.city  || null;
-                  const state = data.state || data.province || null;
-                  const user_ad_id = data.id || null;
-                  let userInfo = [{ state: state, city: city , user_ad_id : user_ad_id}];
-                  let userInfoString = JSON.stringify(userInfo);
-                  localStorage.setItem("userInfo", userInfoString);
-                  setRenderLast(true)
+                const city = data.city || null;
+                const state = data.state || data.province || null;
+                const user_ad_id = data.id || null;
+                let userInfo = [{ state: state, city: city, user_ad_id: user_ad_id }];
+                let userInfoString = JSON.stringify(userInfo);
+                localStorage.setItem("userInfo", userInfoString);
+                setRenderLast(true)
 
-                  setLoginSuccess(true)
+                setLoginSuccess(true)
               }
             })
             .catch(error => console.log(error));
@@ -113,7 +113,7 @@ export default function App() {
       <Suspense fallback={<div></div>}>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index element={renderLast &&<Chat loginState={loginSuccess} />} />
+            <Route index element={renderLast && <Chat loginState={loginSuccess} />} />
             <Route path='inputLevel2' element={<InputLevel2 />} />
             <Route path='recommendations' element={<Recommendations />} />
             <Route path='productInfo' element={<ProductInformation />} />

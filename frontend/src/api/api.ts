@@ -319,7 +319,7 @@ export const historyMessageFeedback = async (messageId: string, feedback: string
   return response
 }
 
-export async function getRecommendations(payload: string, city: string, state: string, user_ad_id:string, selectedTags: any): Promise<any> {
+export async function getRecommendations(payload: string, city: string, state: string, user_ad_id: string, selectedTags: any): Promise<any> {
   const prevId = uuid();
 
   const data = {
@@ -358,7 +358,7 @@ export async function getRecommendations(payload: string, city: string, state: s
   return jsonResponse;
 }
 
-export async function getValuePropositions(payload: string, conversationId: string): Promise<any> {
+export async function getValuePropositions(payload: string, conversationId: string, boat_brand_model: string, traits: string): Promise<any> {
   const prevId = uuid()
   const data = {
     messages: [
@@ -367,8 +367,9 @@ export async function getValuePropositions(payload: string, conversationId: stri
         role: 'user',
         content: payload,
         prompt_type: 2,
-        conversation_id: conversationId
-
+        conversation_id: conversationId,
+        boat_brand_model: boat_brand_model,
+        traits: traits,
       },
     ],
   };
