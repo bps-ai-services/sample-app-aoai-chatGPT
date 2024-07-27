@@ -18,6 +18,20 @@ const Card: React.FC<CardProps> = ({ title, detail }) => {
       : "0 2px 10px rgba(0, 0, 0, 0.08)",
   });
 
+  const formattedDetail = () => {
+    const items = detail.split('<list-item>').filter(item => item.trim() !== '');
+
+    if (items.length === 1) {
+      return <>{items[0]}</>
+    }
+
+    return (
+      <ul>
+        {items.map(item => <li>{item}</li>)}
+      </ul>
+    )
+  }
+
   return (
     <animated.div
       className={Styles.card}
@@ -34,7 +48,7 @@ const Card: React.FC<CardProps> = ({ title, detail }) => {
             },
             fontWeight: "bold",
             fontSize: "24px",
-            },
+          },
         }}>
           {title}
         </Text>
@@ -55,7 +69,7 @@ const Card: React.FC<CardProps> = ({ title, detail }) => {
             fontWeight: "400",
           }
         }}>
-          {detail}
+          {formattedDetail()}
         </Text>
       </Stack>
     </animated.div>
