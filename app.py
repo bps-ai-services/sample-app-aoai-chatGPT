@@ -34,71 +34,8 @@ from backend.utils import (
 )
 from backend.prompt_type import PromptType
 
-from azure.monitor.opentelemetry import configure_azure_monitor
-from opentelemetry.instrumentation.logging import LoggingInstrumentor
-from opentelemetry import trace
-from opentelemetry.trace import (
-    SpanKind,
-    get_tracer_provider,
-)
-from opentelemetry.propagate import extract
-
-
 # Debug settings
 DEBUG = os.environ.get("DEBUG", "false")
-
-# Ensure logging_initialized is defined globally
-logging_initialized = False
-
-
-def initialize_logging():
-    global logging_initialized
-    if not logging_initialized:
-        if DEBUG.lower() == "true":
-
-            # Set up the basic configuration for logging
-            logging.basicConfig(
-                level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-            # Configure Azure Monitor
-            configure_azure_monitor(
-                connection_string=app_settings.base_settings.applicationinsights_connection_string,
-                logger_name="azure_application_logger",
-            )
-
-            # Get and configure logger
-            logger = logging.getLogger("azure_application_logger")
-            logging.setLevel(logging.INFO)
-
-            # Prevent multiple handlers
-            if not logging.hasHandlers():
-                handler = logging.StreamHandler()  # or another handler suitable for your needs
-                formatter = logging.Formatter(
-                    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-                handler.setFormatter(formatter)
-                logging.addHandler(handler)
-
-            # Debug print to check handlers
-            logging.info(
-                f"Logger Handlers after initialization:{logging.handlers}")
-
-            # Instrument logging with OpenTelemetry
-            LoggingInstrumentor().instrument(set_logging_format=True)
-
-            # Set the flag to indicate logging has been initialized
-            logging_initialized = True
-            return logger
-        else:
-            return None
-    else:
-        return logging.getLogger("azure_application_logger")
-
-
-# Initialize logging once
-# logger = initialize_logging()
-
-tracer = trace.get_tracer(__name__, tracer_provider=get_tracer_provider())
-
 bp = Blueprint("routes", __name__, static_folder="static",
                template_folder="static")
 
@@ -525,51 +462,50 @@ async def update_conversation():
     request_json = await request.get_json()
     conversation_id = request_json.get("conversation_id", None)
 
-    with tracer.start_as_current_span("/history/update", context=extract(request.headers), kind=SpanKind.SERVER):
-        try:
-            logging.info("Calling initiating - /history/update")
+    try:
+        logging.info("Calling initiating - /history/update")
 
-            # make sure cosmos is configured
-            cosmos_conversation_client = init_cosmosdb_client()
-            if not cosmos_conversation_client:
-                raise Exception("CosmosDB is not configured or not working")
+        # make sure cosmos is configured
+        cosmos_conversation_client = init_cosmosdb_client()
+        if not cosmos_conversation_client:
+            raise Exception("CosmosDB is not configured or not working")
 
-            # check for the conversation_id, if the conversation is not set, we will create a new one
-            if not conversation_id:
-                raise Exception("No conversation_id found")
+        # check for the conversation_id, if the conversation is not set, we will create a new one
+        if not conversation_id:
+            raise Exception("No conversation_id found")
 
-            # Format the incoming message object in the "chat/completions" messages format
-            # then write it to the conversation history in cosmos
-            messages = request_json["messages"]
-            if len(messages) > 0 and messages[-1]["role"] == "assistant":
-                if len(messages) > 1 and messages[-2].get("role", None) == "tool":
-                    # write the tool message first
-                    await cosmos_conversation_client.create_message(
-                        uuid=str(uuid.uuid4()),
-                        conversation_id=conversation_id,
-                        user_id=user_id,
-                        input_message=messages[-2],
-                    )
-                # write the assistant message
+        # Format the incoming message object in the "chat/completions" messages format
+        # then write it to the conversation history in cosmos
+        messages = request_json["messages"]
+        if len(messages) > 0 and messages[-1]["role"] == "assistant":
+            if len(messages) > 1 and messages[-2].get("role", None) == "tool":
+                # write the tool message first
                 await cosmos_conversation_client.create_message(
-                    uuid=messages[-1]["id"],
+                    uuid=str(uuid.uuid4()),
                     conversation_id=conversation_id,
                     user_id=user_id,
-                    input_message=messages[-1],
+                    input_message=messages[-2],
                 )
-            else:
-                raise Exception("No bot messages found")
+            # write the assistant message
+            await cosmos_conversation_client.create_message(
+                uuid=messages[-1]["id"],
+                conversation_id=conversation_id,
+                user_id=user_id,
+                input_message=messages[-1],
+            )
+        else:
+            raise Exception("No bot messages found")
 
-            # Submit request to Chat Completions for response
-            await cosmos_conversation_client.cosmosdb_client.close()
-            response = {"success": True}
-            logging.info("Calling Completed - /history/update")
-            return jsonify(response), 200
+        # Submit request to Chat Completions for response
+        await cosmos_conversation_client.cosmosdb_client.close()
+        response = {"success": True}
+        logging.info("Calling Completed - /history/update")
+        return jsonify(response), 200
 
-        except Exception as e:
-            # logging.exception("Exception in /history/update")
-            logging.error(f"An error occurred in /history/update : {e}")
-            return jsonify({"error": str(e)}), 500
+    except Exception as e:
+        # logging.exception("Exception in /history/update")
+        logging.error(f"An error occurred in /history/update : {e}")
+        return jsonify({"error": str(e)}), 500
 
 
 @bp.route("/history/message_feedback", methods=["POST"])
@@ -1383,67 +1319,66 @@ async def add_conversation_v3():
     # conversation_id = request_json.get("conversation_id", None)
     conversation_id = request_json['messages'][0].get("conversation_id", None)
 
-    with tracer.start_as_current_span("/v3/history/generate", context=extract(request.headers), kind=SpanKind.SERVER):
-        try:
-            logging.info("Calling initiating - /v3/history/generate")
+    try:
+        logging.info("Calling initiating - /v3/history/generate")
 
-            # make sure cosmos is configured
-            cosmos_conversation_client = init_cosmosdb_client()
-            if not cosmos_conversation_client:
-                raise Exception("CosmosDB is not configured or not working")
+        # make sure cosmos is configured
+        cosmos_conversation_client = init_cosmosdb_client()
+        if not cosmos_conversation_client:
+            raise Exception("CosmosDB is not configured or not working")
 
-            # check for the conversation_id, if the conversation is not set, we will create a new one
-            history_metadata = {}
-            if not conversation_id:
-                title = await generate_title(request_json["messages"])
-                state = request_json['messages'][0].get("state", None)
-                city = request_json['messages'][0].get("city", None)
-                user_ad_id = request_json['messages'][0].get(
-                    "user_ad_id", None)
-                tags = request_json['messages'][0].get("tags", None)
+        # check for the conversation_id, if the conversation is not set, we will create a new one
+        history_metadata = {}
+        if not conversation_id:
+            title = await generate_title(request_json["messages"])
+            state = request_json['messages'][0].get("state", None)
+            city = request_json['messages'][0].get("city", None)
+            user_ad_id = request_json['messages'][0].get(
+                "user_ad_id", None)
+            tags = request_json['messages'][0].get("tags", None)
 
-                conversation_dict = await cosmos_conversation_client.create_conversation(
-                    user_id=user_id, title=title, state=state, city=city, user_ad_id=user_ad_id, tags=tags
+            conversation_dict = await cosmos_conversation_client.create_conversation(
+                user_id=user_id, title=title, state=state, city=city, user_ad_id=user_ad_id, tags=tags
+            )
+
+            conversation_id = conversation_dict["id"]
+            history_metadata["title"] = title
+            history_metadata["date"] = conversation_dict["createdAt"]
+
+        # Format the incoming message object in the "chat/completions" messages format
+        # then write it to the conversation history in cosmos
+        messages = request_json["messages"]
+        if len(messages) > 0 and messages[-1]["role"] == "user":
+            createdMessageValue = await cosmos_conversation_client.create_message(
+                uuid=str(uuid.uuid4()),
+                conversation_id=conversation_id,
+                user_id=user_id,
+                input_message=messages[-1]
+            )
+            if createdMessageValue == "Conversation not found":
+                raise Exception(
+                    "Conversation not found for the given conversation ID: "
+                    + conversation_id
+                    + "."
                 )
+        else:
+            raise Exception("No user message found")
 
-                conversation_id = conversation_dict["id"]
-                history_metadata["title"] = title
-                history_metadata["date"] = conversation_dict["createdAt"]
+        await cosmos_conversation_client.cosmosdb_client.close()
 
-            # Format the incoming message object in the "chat/completions" messages format
-            # then write it to the conversation history in cosmos
-            messages = request_json["messages"]
-            if len(messages) > 0 and messages[-1]["role"] == "user":
-                createdMessageValue = await cosmos_conversation_client.create_message(
-                    uuid=str(uuid.uuid4()),
-                    conversation_id=conversation_id,
-                    user_id=user_id,
-                    input_message=messages[-1]
-                )
-                if createdMessageValue == "Conversation not found":
-                    raise Exception(
-                        "Conversation not found for the given conversation ID: "
-                        + conversation_id
-                        + "."
-                    )
-            else:
-                raise Exception("No user message found")
+        # Submit request to Chat Completions for response
+        request_body = await request.get_json()
+        history_metadata["conversation_id"] = conversation_id
+        # request_body["history_metadata"] = history_metadata
+        request_body["id"] = conversation_id
 
-            await cosmos_conversation_client.cosmosdb_client.close()
+        logging.info("Calling Completing - /v3/history/generate")
+        return await conversation_internal_v3(request_body, request.headers)
 
-            # Submit request to Chat Completions for response
-            request_body = await request.get_json()
-            history_metadata["conversation_id"] = conversation_id
-            # request_body["history_metadata"] = history_metadata
-            request_body["id"] = conversation_id
-
-            logging.info("Calling Completing - /v3/history/generate")
-            return await conversation_internal_v3(request_body, request.headers)
-
-        except Exception as e:
-            # logging.exception("Exception in /v3/history/generate")
-            logging.error(f"An error occurred in /v3/history/generate : {e}")
-            return jsonify({"error": str(e)}), 500
+    except Exception as e:
+        # logging.exception("Exception in /v3/history/generate")
+        logging.error(f"An error occurred in /v3/history/generate : {e}")
+        return jsonify({"error": str(e)}), 500
 
 
 @bp.route("/v3/conversation", methods=["POST"])

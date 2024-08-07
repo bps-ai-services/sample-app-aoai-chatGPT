@@ -1,4 +1,4 @@
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid } from 'uuid'
 import { chatHistorySampleData } from '../constants/chatHistory'
 
 import { ChatMessage, Conversation, ConversationRequest, CosmosDBHealth, CosmosDBStatus, UserInfo } from './models'
@@ -319,8 +319,14 @@ export const historyMessageFeedback = async (messageId: string, feedback: string
   return response
 }
 
-export async function getRecommendations(payload: string, city: string, state: string, user_ad_id: string, selectedTags: any): Promise<any> {
-  const prevId = uuid();
+export async function getRecommendations(
+  payload: string,
+  city: string,
+  state: string,
+  user_ad_id: string,
+  selectedTags: any
+): Promise<any> {
+  const prevId = uuid()
 
   const data = {
     messages: [
@@ -332,33 +338,40 @@ export async function getRecommendations(payload: string, city: string, state: s
         state: state,
         user_ad_id: user_ad_id,
         tags: selectedTags,
-        prompt_type: 1,
-      },
-    ],
-  };
+        prompt_type: 1
+      }
+    ]
+  }
 
   const response = await fetch('/v3/history/generate', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
-    body: JSON.stringify(data),
-  });
+    body: JSON.stringify(data)
+  })
 
-  const jsonResponse = await response.json();
-  const historyData = [{
-    id: prevId,
-    role: "assistant",
-    content: jsonResponse.messages,
-    date: new Date().toISOString(),
-    conversation_id: jsonResponse.id
-  }]
+  const jsonResponse = await response.json()
+  const historyData = [
+    {
+      id: prevId,
+      role: 'assistant',
+      content: jsonResponse.messages,
+      date: new Date().toISOString(),
+      conversation_id: jsonResponse.id
+    }
+  ]
 
-  historyUpdate(historyData, jsonResponse.id);
-  return jsonResponse;
+  historyUpdate(historyData, jsonResponse.id)
+  return jsonResponse
 }
 
-export async function getValuePropositions(payload: string, conversationId: string, boat_brand_model: string, traits: string): Promise<any> {
+export async function getValuePropositions(
+  payload: string,
+  conversationId: string,
+  boat_brand_model: string,
+  traits: string
+): Promise<any> {
   const prevId = uuid()
   const data = {
     messages: [
@@ -369,29 +382,31 @@ export async function getValuePropositions(payload: string, conversationId: stri
         prompt_type: 2,
         conversation_id: conversationId,
         boat_brand_model: boat_brand_model,
-        traits: traits,
-      },
-    ],
-  };
+        traits: traits
+      }
+    ]
+  }
 
   const response = await fetch('/v3/history/generate', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
-    body: JSON.stringify(data),
-  });
+    body: JSON.stringify(data)
+  })
 
-  const jsonResponse = await response.json();
-  const historyData = [{
-    id: prevId,
-    role: "assistant",
-    content: jsonResponse.messages,
-    conversation_id: conversationId,
-    date: new Date().toISOString()
-  }]
-  historyUpdate(historyData, conversationId);
-  return jsonResponse;
+  const jsonResponse = await response.json()
+  const historyData = [
+    {
+      id: prevId,
+      role: 'assistant',
+      content: jsonResponse.messages,
+      conversation_id: conversationId,
+      date: new Date().toISOString()
+    }
+  ]
+  historyUpdate(historyData, conversationId)
+  return jsonResponse
 }
 
 export async function getWalkthroughData(payload: string, conversationId: string): Promise<any> {
@@ -403,30 +418,31 @@ export async function getWalkthroughData(payload: string, conversationId: string
         role: 'user',
         content: payload,
         prompt_type: 3,
-        conversation_id: conversationId,
-
-      },
-    ],
-  };
+        conversation_id: conversationId
+      }
+    ]
+  }
 
   const response = await fetch('/v3/history/generate', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
-    body: JSON.stringify(data),
-  });
+    body: JSON.stringify(data)
+  })
 
-  const jsonResponse = await response.json();
-  const historyData = [{
-    id: prevId,
-    role: "assistant",
-    content: jsonResponse.messages,
-    conversation_id: conversationId,
-    date: new Date().toISOString()
-  }]
-  historyUpdate(historyData, conversationId);
-  return jsonResponse;
+  const jsonResponse = await response.json()
+  const historyData = [
+    {
+      id: prevId,
+      role: 'assistant',
+      content: jsonResponse.messages,
+      conversation_id: conversationId,
+      date: new Date().toISOString()
+    }
+  ]
+  historyUpdate(historyData, conversationId)
+  return jsonResponse
 }
 
 export async function sendFeedback(feedbackInput: string, feedback: string, conversationId: string): Promise<any> {
@@ -436,33 +452,20 @@ export async function sendFeedback(feedbackInput: string, feedback: string, conv
       {
         id: prevId,
         role: 'user',
-        content: "",
+        content: '',
         conversation_id: conversationId,
         conversation_feedback: feedback,
         conversation_feedback_message: feedbackInput
-      },
-    ],
-  };
+      }
+    ]
+  }
   const response = await fetch('/v3/history/conversation_feedback', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
-    body: JSON.stringify(data),
-  });
+    body: JSON.stringify(data)
+  })
 
-
-  return response;
+  return response
 }
-
-// export async function getStates(): Promise<string[]> {
-//   const response = await fetch('/ref/states');
-//   const states = await response.json();
-//   return states as string[];
-// }
-
-// export async function getCities(state: string | number): Promise<string[]> {
-//   const response = await fetch(`/ref/cities?state=${state}`);
-//   const cities = await response.json();
-//   return cities as string[];
-// }
