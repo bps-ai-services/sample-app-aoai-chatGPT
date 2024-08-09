@@ -5,16 +5,10 @@ import { ShieldLockRegular } from '@fluentui/react-icons'
 import { v4 as uuid } from 'uuid'
 
 import styles from './Chat.module.css'
-import logo from "../../assets/logo.png"
-import {
-  ChatMessage,
-  getUserInfo,
-  historyUpdate,
-  ChatHistoryLoadingState,
-  CosmosDBStatus
-} from "../../api";
-import { AppStateContext } from "../../state/AppProvider";
-import { useBoolean } from "@fluentui/react-hooks";
+import logo from '../../assets/Contoso.svg'
+import { ChatMessage, getUserInfo, historyUpdate, ChatHistoryLoadingState, CosmosDBStatus } from '../../api'
+import { AppStateContext } from '../../state/AppProvider'
+import { useBoolean } from '@fluentui/react-hooks'
 import Home from '../../components/Home/Home'
 import SplashScreen from '../../components/SplashScreen'
 import UserInfo from '../../components/UserInformation/UserInfo'
@@ -26,13 +20,13 @@ const enum messageStatus {
 }
 
 interface UserInfoModel {
-  id: string;
-  name: string;
+  id: string
+  name: string
 }
 interface Props {
-  loginState:boolean
+  loginState: boolean
 }
-const Chat:React.FC<Props>= ({loginState=false}) => {
+const Chat: React.FC<Props> = ({ loginState = false }) => {
   //console.log({loginState})
   const appStateContext = useContext(AppStateContext)
   const AUTH_ENABLED = appStateContext?.state.frontendSettings?.auth_enabled
@@ -40,13 +34,11 @@ const Chat:React.FC<Props>= ({loginState=false}) => {
   const [showAuthMessage, setShowAuthMessage] = useState<boolean | undefined>()
   const [processMessages, setProcessMessages] = useState<messageStatus>(messageStatus.NotRunning)
   const [hideErrorDialog, { toggle: toggleErrorDialog }] = useBoolean(true)
-  const [userInfo, setUserInfo] = useState<UserInfo[]>([]);
+  const [userInfo, setUserInfo] = useState<UserInfo[]>([])
 
   const [ERROR] = ['error']
   const NO_CONTENT_ERROR = 'No content in messages object.'
-  const [loading, setLoading] = useState(true);
-
-  
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (
@@ -133,11 +125,11 @@ const Chat:React.FC<Props>= ({loginState=false}) => {
     chatMessageStreamEnd.current?.scrollIntoView({ behavior: 'smooth' })
   }, [processMessages])
 
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(true)
 
   const handleTimeout = () => {
-    setShowSplash(!loginState);
-  };
+    setShowSplash(!loginState)
+  }
 
   // useEffect(() => {
   //   const userInfoFromLocalStorage = localStorage.getItem('userInfo');
@@ -153,21 +145,20 @@ const Chat:React.FC<Props>= ({loginState=false}) => {
 
   //   }
   // }, [])
-  const [isDatainLocalStorage,setIsDataInLocalStorage]=useState(null)
-  useEffect(()=>{
-    const storeuserinfo=localStorage.getItem("userInfo");
-    let storageval;
-    if(storeuserinfo){
-        storageval=JSON.parse(storeuserinfo);
+  const [isDatainLocalStorage, setIsDataInLocalStorage] = useState(null)
+  useEffect(() => {
+    const storeuserinfo = localStorage.getItem('userInfo')
+    let storageval
+    if (storeuserinfo) {
+      storageval = JSON.parse(storeuserinfo)
 
-        setIsDataInLocalStorage(storageval[0].city)
-    } 
-
-  },[])
+      setIsDataInLocalStorage(storageval[0].city)
+    }
+  }, [])
 
   //console.log({isDatainLocalStorage})
   //console.log("userInfo ->chat", userInfo)
- 
+
   return (
     <div className={styles.container} role="main">
       {showAuthMessage ? (
@@ -202,13 +193,7 @@ const Chat:React.FC<Props>= ({loginState=false}) => {
           {!loginState ? (
             <SplashScreen logo={logo} duration={500} onTimeout={handleTimeout} />
           ) : (
-            <>
-              {isDatainLocalStorage!==null ? (
-                <Home />
-              ) : (
-                <UserInfo />
-              )}
-            </>
+            <>{isDatainLocalStorage !== null ? <Home /> : <UserInfo />}</>
           )}
         </div>
       )}
