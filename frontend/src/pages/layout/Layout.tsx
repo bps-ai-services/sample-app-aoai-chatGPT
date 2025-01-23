@@ -42,7 +42,7 @@ const Layout = () => {
 
   useEffect(() => {
     if (!appStateContext?.state.isLoading) {
-      setLogo(ui?.logo || Contoso)
+      setLogo(ui?.logo || Bps)
     }
   }, [appStateContext?.state.isLoading])
 
