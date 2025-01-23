@@ -630,7 +630,7 @@ const Chat = () => {
                                 />
                                 <h1 className={styles.chatEmptyStateTitle}>Start chatting</h1>
                                 <h2 className={styles.chatEmptyStateSubtitle}>This Outfitter Assistant is configured to answer your questions</h2>
-                                <h2 className={styles.chatEmptyStateNotification}>BPS ChatGPT Outfitter Assistant will be depricated on March 31, 2025. </h2>
+                                <h3 className={styles.chatEmptyStateNotification}>BPS ChatGPT Outfitter Assistant will be depricated on March 31, 2025. </h3>
 
                             </Stack>
                         ) : (
