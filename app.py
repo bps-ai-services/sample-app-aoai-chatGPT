@@ -43,6 +43,7 @@ cosmos_db_ready = asyncio.Event()
 
 def create_app():
     app = Quart(__name__)
+    app.config["PROVIDE_AUTOMATIC_OPTIONS"] = False
     app.register_blueprint(bp)
     app.config["TEMPLATES_AUTO_RELOAD"] = True
     

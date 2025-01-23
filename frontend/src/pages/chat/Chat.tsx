@@ -12,7 +12,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { nord } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 import styles from './Chat.module.css'
-import Contoso from '../../assets/Contoso.svg'
+import Bps from '../../assets/Bps.svg'
 import { XSSAllowTags } from '../../constants/sanatizeAllowables'
 
 import {
@@ -791,9 +791,10 @@ const Chat = () => {
           <div className={styles.chatContainer}>
             {!messages || messages.length < 1 ? (
               <Stack className={styles.chatEmptyState}>
-                <img src={logo} className={styles.chatIcon} aria-hidden="true" />
-                <h1 className={styles.chatEmptyStateTitle}>{ui?.chat_title}</h1>
-                <h2 className={styles.chatEmptyStateSubtitle}>{ui?.chat_description}</h2>
+                <img src={Bps} className={styles.chatIcon} aria-hidden="true" />
+                <h1 className={styles.chatEmptyStateTitle}>Start chatting</h1>
+                <h2 className={styles.chatEmptyStateSubtitle}>This Outfitter Assistant is configured to answer your questions</h2>
+                <h3 className={styles.chatEmptyStateNotification}>BPS ChatGPT Outfitter Assistant will be depricated on March 31, 2025.</h3>
               </Stack>
             ) : (
               <div className={styles.chatMessageStream} style={{ marginBottom: isLoading ? '40px' : '0px' }} role="log">
