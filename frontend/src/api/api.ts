@@ -107,34 +107,42 @@ export const historyRead = async (convId: string): Promise<ChatMessage[]> => {
     return response
 }
 
-export const historyGenerate = async (options: ConversationRequest, abortSignal: AbortSignal, convId?: string): Promise<Response> => {
-    let body;
-    if(convId){
-        body = JSON.stringify({
-            conversation_id: convId,
-            messages: options.messages
-        })
-    }else{
-        body = JSON.stringify({
-            messages: options.messages
-        })
+export const historyGenerate = async (
+    options: ConversationRequest,
+    abortSignal: AbortSignal,
+    convId?: string
+  ): Promise<Response> => {
+    let body
+    if (convId) {
+      body = JSON.stringify({
+        conversation_id: convId,
+        messages: options.messages
+      })
+    } else {
+      body = JSON.stringify({
+        messages: options.messages
+      })
     }
-    const response = await fetch("/history/generate", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: body,
-        signal: abortSignal
-    }).then((res) => {
+  
+    console.log('Request Body:', body) // Add this line to log the request body
+  
+    const response = await fetch('/history/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: body,
+      signal: abortSignal
+    })
+      .then(res => {
         return res
-    })
-    .catch((err) => {
-        console.error("There was an issue fetching your data.");
-        return new Response;
-    })
+      })
+      .catch(_err => {
+        console.error('There was an issue fetching your data.')
+        return new Response()
+      })
     return response
-}
+  }
 
 export const historyUpdate = async (messages: ChatMessage[], convId: string): Promise<Response> => {
     const response = await fetch("/history/update", {

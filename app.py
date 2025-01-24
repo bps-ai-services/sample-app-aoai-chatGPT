@@ -2,6 +2,7 @@ import copy
 import json
 import os
 import logging
+import asyncio
 import uuid
 from dotenv import load_dotenv
 
@@ -25,8 +26,10 @@ bp = Blueprint("routes", __name__, static_folder='static')
 
 def create_app():
     app = Quart(__name__)
-    app.config["PROVIDE_AUTOMATIC_OPTIONS"] = False
     app.register_blueprint(bp)
+    app.config["TEMPLATES_AUTO_RELOAD"] = True
+    app.config["PROVIDE_AUTOMATIC_OPTIONS"] = False
+
     return app
 
 
