@@ -25,6 +25,7 @@ bp = Blueprint("routes", __name__, static_folder='static')
 
 def create_app():
     app = Quart(__name__)
+    app.config["PROVIDE_AUTOMATIC_OPTIONS"] = False
     app.register_blueprint(bp)
     return app
 
