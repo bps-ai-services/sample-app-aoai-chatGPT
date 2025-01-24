@@ -128,6 +128,9 @@ export const historyGenerate = async (
       messages: options.messages
     })
   }
+
+  console.log('Request Body:', body) // Add this line to log the request body
+
   const response = await fetch('/history/generate', {
     method: 'POST',
     headers: {
